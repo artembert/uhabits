@@ -24,7 +24,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/contrast0"
+    android:background="?attr/colorSurface"
     android:fitsSystemWindows="true"
     android:orientation="vertical"
     tools:context=".activities.habits.edit.EditHabitActivity">
@@ -33,17 +33,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <androidx.appcompat.widget.Toolbar
+        <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?attr/colorPrimary"
-            android:elevation="2dp"
+            android:background="?attr/colorSurface"
+            android:elevation="0dp"
             android:gravity="end"
             android:minHeight="?attr/actionBarSize"
-            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-            app:title="@string/create_habit"
-            app:titleTextColor="@color/white">
+            app:title="@string/create_habit">
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/buttonSave"
@@ -56,7 +54,7 @@
                 android:textColor="@color/white"
                 app:rippleColor="@color/white"
                 app:strokeColor="@color/white" />
-        </androidx.appcompat.widget.Toolbar>
+        </com.google.android.material.appbar.MaterialToolbar>
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -65,7 +63,7 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        android:background="?attr/contrast0">
+        android:background="?attr/colorSurface">
 
         <LinearLayout
             android:layout_width="match_parent"

@@ -23,23 +23,21 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:orientation="vertical"
-              android:background="?attr/windowBackgroundColor">
+              android:background="?attr/colorSurface">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <androidx.appcompat.widget.Toolbar
+        <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?attr/colorPrimary"
-            android:elevation="2dp"
+            android:background="?attr/colorSurface"
+            android:elevation="0dp"
             android:gravity="end"
             android:minHeight="?attr/actionBarSize"
-            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-            app:title="@string/app_name"
-            app:titleTextColor="@color/white">
+            app:title="@string/app_name">
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/buttonSave"
@@ -52,7 +50,7 @@
                 android:textColor="@color/white"
                 app:rippleColor="@color/white"
                 app:strokeColor="@color/white" />
-        </androidx.appcompat.widget.Toolbar>
+        </com.google.android.material.appbar.MaterialToolbar>
 
     </com.google.android.material.appbar.AppBarLayout>
 
