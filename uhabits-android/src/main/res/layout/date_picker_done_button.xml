@@ -19,25 +19,21 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal" >
     
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/clear"
-        style="?android:attr/buttonBarButtonStyle"
+        style="@style/Widget.Material3.Button.TextButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:minHeight="48dp"
-        android:text="@string/clear"
-        android:textSize="@dimen/done_label_size"
-        android:textColor="@color/done_text_color" />
+        android:text="@string/clear" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/done"
-        style="?android:attr/buttonBarButtonStyle"
+        style="@style/Widget.Material3.Button.TextButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:minHeight="48dp"
-        android:text="@string/done_label"
-        android:textSize="@dimen/done_label_size"
-        android:textColor="@color/done_text_color" />
+        android:text="@string/done_label" />
 </LinearLayout>

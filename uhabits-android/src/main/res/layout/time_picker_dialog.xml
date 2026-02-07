@@ -55,27 +55,23 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal" >
 
-        <androidx.appcompat.widget.AppCompatButton
-            style="?android:attr/buttonBarButtonStyle"
+        <com.google.android.material.button.MaterialButton
+            style="@style/Widget.Material3.Button.TextButton"
             android:id="@+id/clear_button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:minHeight="48dp"
-            android:textColor="#333"
-            android:text="@string/clear_label"
-            android:textSize="@dimen/done_label_size" />
+            android:text="@string/clear_label" />
 
-        <androidx.appcompat.widget.AppCompatButton
-            style="?android:attr/buttonBarButtonStyle"
+        <com.google.android.material.button.MaterialButton
+            style="@style/Widget.Material3.Button.TextButton"
             android:id="@+id/done_button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:minHeight="48dp"
-            android:textColor="#333"
-            android:text="@string/done_label"
-            android:textSize="@dimen/done_label_size" />
+            android:text="@string/done_label" />
     </androidx.appcompat.widget.LinearLayoutCompat>
 
 </LinearLayout>
