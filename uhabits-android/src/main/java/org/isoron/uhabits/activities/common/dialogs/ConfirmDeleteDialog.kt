@@ -19,8 +19,8 @@
 package org.isoron.uhabits.activities.common.dialogs
 
 import android.content.Context
-import android.content.DialogInterface
 import androidx.appcompat.app.AlertDialog
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.isoron.uhabits.R
 import org.isoron.uhabits.core.ui.callbacks.OnConfirmedCallback
 import org.isoron.uhabits.inject.ActivityContext
@@ -28,22 +28,16 @@ import org.isoron.uhabits.inject.ActivityContext
 /**
  * Dialog that asks the user confirmation before executing a delete operation.
  */
-class ConfirmDeleteDialog(
+fun ConfirmDeleteDialog(
     @ActivityContext context: Context,
     callback: OnConfirmedCallback,
     quantity: Int
-) : AlertDialog(context) {
-    init {
-        val res = context.resources
-        setTitle(res.getQuantityString(R.plurals.delete_habits_title, quantity))
-        setMessage(res.getQuantityString(R.plurals.delete_habits_message, quantity))
-        setButton(
-            BUTTON_POSITIVE,
-            res.getString(R.string.yes)
-        ) { dialog: DialogInterface?, which: Int -> callback.onConfirmed() }
-        setButton(
-            BUTTON_NEGATIVE,
-            res.getString(R.string.no)
-        ) { dialog: DialogInterface?, which: Int -> }
-    }
+): AlertDialog {
+    val res = context.resources
+    return MaterialAlertDialogBuilder(context)
+        .setTitle(res.getQuantityString(R.plurals.delete_habits_title, quantity))
+        .setMessage(res.getQuantityString(R.plurals.delete_habits_message, quantity))
+        .setPositiveButton(res.getString(R.string.yes)) { _, _ -> callback.onConfirmed() }
+        .setNegativeButton(res.getString(R.string.no), null)
+        .create()
 }

@@ -18,16 +18,17 @@
  */
 package org.isoron.uhabits.notifications
 
-import android.app.AlertDialog
 import android.content.ContentUris
 import android.os.Bundle
 import android.text.format.DateFormat
 import android.view.View
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemClickListener
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.FragmentActivity
 import com.android.datetimepicker.time.RadialPickerLayout
 import com.android.datetimepicker.time.TimePickerDialog
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.isoron.platform.gui.toInt
 import org.isoron.uhabits.HabitsApplication
 import org.isoron.uhabits.R
@@ -63,7 +64,7 @@ class SnoozeDelayPickerActivity : FragmentActivity(), OnItemClickListener {
         if (habit == null) finish()
         androidColor = themeSwitcher.currentTheme.color(habit!!.color).toInt()
         reminderController = appComponent.reminderController
-        dialog = AlertDialog.Builder(this)
+        dialog = MaterialAlertDialogBuilder(this)
             .setTitle(R.string.select_snooze_delay)
             .setItems(R.array.snooze_picker_names, null)
             .create()

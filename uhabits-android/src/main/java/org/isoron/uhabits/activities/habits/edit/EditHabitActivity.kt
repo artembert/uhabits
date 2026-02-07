@@ -29,11 +29,11 @@ import android.text.format.DateFormat
 import android.view.View
 import android.widget.ArrayAdapter
 import androidx.annotation.StringRes
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.DialogFragment
 import com.android.datetimepicker.time.RadialPickerLayout
 import com.android.datetimepicker.time.TimePickerDialog
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.isoron.platform.gui.toInt
 import org.isoron.uhabits.HabitsApplication
 import org.isoron.uhabits.R
@@ -175,7 +175,7 @@ class EditHabitActivity : AppCompatActivity() {
 
         populateTargetType()
         binding.targetTypePicker.setOnClickListener {
-            val builder = AlertDialog.Builder(this)
+            val builder = MaterialAlertDialogBuilder(this)
             val arrayAdapter = ArrayAdapter<String>(this, android.R.layout.select_dialog_item)
             arrayAdapter.add(getString(R.string.target_type_at_least))
             arrayAdapter.add(getString(R.string.target_type_at_most))
@@ -192,7 +192,7 @@ class EditHabitActivity : AppCompatActivity() {
         }
 
         binding.numericalFrequencyPicker.setOnClickListener {
-            val builder = AlertDialog.Builder(this)
+            val builder = MaterialAlertDialogBuilder(this)
             val arrayAdapter = ArrayAdapter<String>(this, android.R.layout.select_dialog_item)
             arrayAdapter.add(getString(R.string.every_day))
             arrayAdapter.add(getString(R.string.every_week))

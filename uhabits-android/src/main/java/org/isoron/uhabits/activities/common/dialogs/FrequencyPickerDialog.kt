@@ -28,6 +28,7 @@ import android.widget.RadioButton
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDialogFragment
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.isoron.uhabits.R
 import org.isoron.uhabits.databinding.FrequencyPickerDialogBinding
 
@@ -115,7 +116,7 @@ class FrequencyPickerDialog(
             if (hasFocus) check(binding.xTimesPerYDaysRadioButton)
         }
 
-        return AlertDialog.Builder(requireActivity())
+        return MaterialAlertDialogBuilder(requireActivity())
             .setView(binding.root)
             .setPositiveButton(R.string.save) { _, _ -> onSaveClicked() }
             .create()

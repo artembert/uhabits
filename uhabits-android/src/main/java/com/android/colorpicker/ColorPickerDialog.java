@@ -27,6 +27,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatDialogFragment;
 
 import com.android.colorpicker.ColorPickerSwatch.OnColorSelectedListener;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import org.isoron.uhabits.R;
 
@@ -115,7 +116,7 @@ public class ColorPickerDialog extends AppCompatDialogFragment implements OnColo
             showPaletteView();
         }
 
-        mAlertDialog = new AlertDialog.Builder(activity)
+        mAlertDialog = new MaterialAlertDialogBuilder(activity)
             .setTitle(mTitleResId)
             .setView(view)
             .create();

@@ -24,6 +24,7 @@ import android.content.DialogInterface.OnMultiChoiceClickListener
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDialogFragment
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.isoron.uhabits.R
 import org.isoron.uhabits.core.models.WeekdayList
 import org.isoron.uhabits.core.utils.DateUtils
@@ -59,7 +60,7 @@ class WeekdayPickerDialog :
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val builder = AlertDialog.Builder(
+        val builder = MaterialAlertDialogBuilder(
             requireActivity()
         )
         builder
