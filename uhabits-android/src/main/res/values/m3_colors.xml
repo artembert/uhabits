@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- M3 Light Theme Colors -->
+    <color name="md_theme_primary">#005AC1</color>
+    <color name="md_theme_onPrimary">#FFFFFF</color>
+    <color name="md_theme_primaryContainer">#D8E2FF</color>
+    <color name="md_theme_onPrimaryContainer">#001A41</color>
+    <color name="md_theme_secondary">#575E71</color>
+    <color name="md_theme_onSecondary">#FFFFFF</color>
+    <color name="md_theme_secondaryContainer">#DBE2F9</color>
+    <color name="md_theme_onSecondaryContainer">#141B2C</color>
+    <color name="md_theme_tertiary">#715573</color>
+    <color name="md_theme_onTertiary">#FFFFFF</color>
+    <color name="md_theme_tertiaryContainer">#FBD7FC</color>
+    <color name="md_theme_onTertiaryContainer">#29132D</color>
+    <color name="md_theme_error">#BA1A1A</color>
+    <color name="md_theme_onError">#FFFFFF</color>
+    <color name="md_theme_errorContainer">#FFDAD6</color>
+    <color name="md_theme_onErrorContainer">#410002</color>
+    <color name="md_theme_background">#FEF7FF</color>
+    <color name="md_theme_onBackground">#1D1B20</color>
+    <color name="md_theme_surface">#FEF7FF</color>
+    <color name="md_theme_onSurface">#1D1B20</color>
+    <color name="md_theme_surfaceVariant">#E1E2EC</color>
+    <color name="md_theme_onSurfaceVariant">#44474F</color>
+    <color name="md_theme_outline">#74777F</color>
+    <color name="md_theme_outlineVariant">#C4C6D0</color>
+    <color name="md_theme_scrim">#000000</color>
+    <color name="md_theme_inverseSurface">#322F35</color>
+    <color name="md_theme_inverseOnSurface">#F5EFF4</color>
+    <color name="md_theme_inversePrimary">#ADC6FF</color>
+    <color name="md_theme_surfaceDim">#DED8E1</color>
+    <color name="md_theme_surfaceBright">#FEF7FF</color>
+    <color name="md_theme_surfaceContainerLowest">#FFFFFF</color>
+    <color name="md_theme_surfaceContainerLow">#F7F2FA</color>
+    <color name="md_theme_surfaceContainer">#F3EDF7</color>
+    <color name="md_theme_surfaceContainerHigh">#ECE6F0</color>
+    <color name="md_theme_surfaceContainerHighest">#E6E0E9</color>
+</resources>
