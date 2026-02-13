@@ -19,7 +19,7 @@ This document outlines the step-by-step iterative migration of Loop Habit Tracke
 
 ### 1.1 Dependency Audit
 - **Task**: Ensure `com.google.android.material:material` is at least version `1.11.0` or higher.
-- **Verification**: Check `gradle/libs.versions.toml`. (Current: `1.12.0` - OK).
+- **Verification**: Check `gradle/libs.versions.toml`. (Current: `1.13.0` - OK).
 
 ### 1.2 M3 Color System Definition
 - **Task**: Create `res/values/m3_colors.xml` (and `-night`).
