@@ -87,6 +87,7 @@ class ListHabitsRootView @Inject constructor(
         val appBarLayout = AppBarLayout(context).apply {
             background = null // Let background be handled by children or window
             stateListAnimator = null // Remove shadow
+            fitsSystemWindows = true // Ensure content starts below status bar
         }
         
         val collapsingToolbarLayout = CollapsingToolbarLayout(context).apply {
