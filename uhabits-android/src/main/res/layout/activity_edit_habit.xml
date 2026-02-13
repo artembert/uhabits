@@ -78,24 +78,24 @@
                 android:baselineAligned="false">
 
                 <!-- Habit Title -->
-                <FrameLayout
-                    style="@style/FormOuterBox"
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/nameInputLayout"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                     android:layout_width="0dp"
-                    android:layout_weight="1">
-                    <LinearLayout style="@style/FormInnerBox">
-                        <TextView
-                            style="@style/FormLabel"
-                            android:text="@string/name" />
-                        <EditText
-                            android:id="@+id/nameInput"
-                            style="@style/FormInput"
-                            android:maxLines="2"
-                            android:maxLength="50"
-                            android:inputType="textCapSentences|textMultiLine"
-                            android:hint="@string/yes_or_no_short_example"
-                            />
-                    </LinearLayout>
-                </FrameLayout>
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_margin="4dp"
+                    android:hint="@string/name">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/nameInput"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:maxLines="2"
+                        android:maxLength="50"
+                        android:inputType="textCapSentences|textMultiLine"
+                        android:hint="@string/yes_or_no_short_example" />
+                </com.google.android.material.textfield.TextInputLayout>
 
                 <!-- Habit Color -->
                 <FrameLayout
@@ -126,19 +126,21 @@
             </LinearLayout>
 
             <!-- Habit Question -->
-            <FrameLayout style="@style/FormOuterBox">
-                <LinearLayout style="@style/FormInnerBox">
-                    <TextView
-                        style="@style/FormLabel"
-                        android:text="@string/question" />
-                    <EditText
-                        android:id="@+id/questionInput"
-                        style="@style/FormInput"
-                        android:inputType="textCapSentences|textMultiLine"
-                        android:hint="@string/example_question_boolean"
-                         />
-                </LinearLayout>
-            </FrameLayout>
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/questionInputLayout"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="4dp"
+                android:hint="@string/question">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/questionInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textCapSentences|textMultiLine"
+                    android:hint="@string/example_question_boolean" />
+            </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Frequency -->
             <FrameLayout
@@ -156,21 +158,22 @@
             </FrameLayout>
 
             <!-- Target value, unit and frequency -->
-            <FrameLayout
+            <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/unitOuterBox"
-                style="@style/FormOuterBox">
-                <LinearLayout style="@style/FormInnerBox">
-                    <TextView
-                        style="@style/FormLabel"
-                        android:text="@string/unit" />
-                    <EditText
-                        style="@style/FormInput"
-                        android:id="@+id/unitInput"
-                        android:maxLines="1"
-                        android:ems="10"
-                        android:hint="@string/measurable_units_example"/>
-                </LinearLayout>
-            </FrameLayout>
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="4dp"
+                android:hint="@string/unit">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/unitInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:ems="10"
+                    android:hint="@string/measurable_units_example" />
+            </com.google.android.material.textfield.TextInputLayout>
 
             <LinearLayout
                 android:id="@+id/targetOuterBox"
@@ -178,22 +181,25 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:baselineAligned="false">
-                <FrameLayout
-                    style="@style/FormOuterBox"
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/targetInputLayout"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                     android:layout_width="0dp"
-                    android:layout_weight="1">
-                    <LinearLayout style="@style/FormInnerBox">
-                        <TextView
-                            style="@style/FormLabel"
-                            android:text="@string/target" />
-                        <EditText
-                            style="@style/FormInput"
-                            android:id="@+id/targetInput"
-                            android:maxLines="1"
-                            android:inputType="numberDecimal"
-                            android:hint="@string/example_target"/>
-                    </LinearLayout>
-                </FrameLayout>
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_margin="4dp"
+                    android:hint="@string/target">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/targetInput"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:maxLines="1"
+                        android:inputType="numberDecimal"
+                        android:hint="@string/example_target" />
+                </com.google.android.material.textfield.TextInputLayout>
+
                 <FrameLayout
                     style="@style/FormOuterBox"
                     android:layout_width="0dp"
@@ -253,19 +259,21 @@
 
 
             <!-- Notes -->
-            <FrameLayout style="@style/FormOuterBox">
-                <LinearLayout style="@style/FormInnerBox">
-                    <TextView
-                        style="@style/FormLabel"
-                        android:text="@string/notes" />
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/notesInputLayout"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="4dp"
+                android:hint="@string/notes">
 
-                    <EditText
-                        android:id="@+id/notesInput"
-                        style="@style/FormInput"
-                        android:inputType="textCapSentences|textMultiLine"
-                        android:hint="@string/example_notes" />
-                </LinearLayout>
-            </FrameLayout>
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/notesInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textCapSentences|textMultiLine"
+                    android:hint="@string/example_notes" />
+            </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
     </ScrollView>
 

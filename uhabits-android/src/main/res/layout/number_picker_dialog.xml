@@ -89,27 +89,22 @@
         android:padding="5dp"
         android:baselineAligned="false">
 
-        <FrameLayout
-            style="@style/FormOuterBox"
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
             android:layout_width="0dp"
-            android:layout_weight="1">
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="@string/notes">
 
-            <LinearLayout style="@style/DialogFormInnerBox">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etNotes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textCapSentences|textMultiLine"
+                android:scrollbars="vertical"
+                android:hint="@string/example_notes"/>
 
-                <TextView
-                    style="@style/DialogFormLabel"
-                    android:text="@string/notes" />
-
-                <EditText
-                    android:id="@+id/etNotes"
-                    android:inputType="textCapSentences|textMultiLine"
-                    style="@style/FormInput"
-                    android:scrollbars="vertical"
-                    android:hint="@string/example_notes"/>
-
-            </LinearLayout>
-
-        </FrameLayout>
+        </com.google.android.material.textfield.TextInputLayout>
 
     </LinearLayout>
 

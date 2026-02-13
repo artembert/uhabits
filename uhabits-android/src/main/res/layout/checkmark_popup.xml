@@ -30,7 +30,7 @@
     app:divider="@drawable/checkmark_dialog_divider"
     app:showDividers="middle">
 
-    <androidx.appcompat.widget.AppCompatEditText
+    <com.google.android.material.textfield.TextInputEditText
         android:id="@+id/notes"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -82,7 +82,7 @@
         app:divider="@drawable/checkmark_dialog_divider"
         app:showDividers="middle">
 
-        <androidx.appcompat.widget.AppCompatEditText
+        <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/value"
             android:layout_width="0dp"
             android:layout_height="match_parent"

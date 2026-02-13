@@ -23,8 +23,6 @@ import android.annotation.SuppressLint
 import android.content.res.ColorStateList
 import android.content.res.Resources
 import android.os.Bundle
-import android.text.Html
-import android.text.Spanned
 import android.text.format.DateFormat
 import android.view.View
 import android.widget.ArrayAdapter
@@ -268,9 +266,9 @@ class EditHabitActivity : AppCompatActivity() {
             habit.copyFrom(original)
         }
 
-        habit.name = binding.nameInput.text.trim().toString()
-        habit.question = binding.questionInput.text.trim().toString()
-        habit.description = binding.notesInput.text.trim().toString()
+        habit.name = binding.nameInput.text?.toString()?.trim() ?: ""
+        habit.question = binding.questionInput.text?.toString()?.trim() ?: ""
+        habit.description = binding.notesInput.text?.toString()?.trim() ?: ""
         habit.color = color
         if (reminderHour >= 0) {
             habit.reminder = Reminder(reminderHour, reminderMin, reminderDays)
@@ -280,9 +278,9 @@ class EditHabitActivity : AppCompatActivity() {
 
         habit.frequency = Frequency(freqNum, freqDen)
         if (habitType == HabitType.NUMERICAL) {
-            habit.targetValue = binding.targetInput.text.toString().toDouble()
+            habit.targetValue = binding.targetInput.text?.toString()?.toDoubleOrNull() ?: 0.0
             habit.targetType = targetType
-            habit.unit = binding.unitInput.text.trim().toString()
+            habit.unit = binding.unitInput.text?.toString()?.trim() ?: ""
         }
         habit.type = habitType
 
@@ -305,14 +303,19 @@ class EditHabitActivity : AppCompatActivity() {
 
     private fun validate(): Boolean {
         var isValid = true
-        if (binding.nameInput.text.isEmpty()) {
-            binding.nameInput.error = getFormattedValidationError(R.string.validation_cannot_be_blank)
+        if (binding.nameInput.text.isNullOrEmpty()) {
+            binding.nameInputLayout.error = getString(R.string.validation_cannot_be_blank)
             isValid = false
+        } else {
+            binding.nameInputLayout.error = null
         }
+
         if (habitType == HabitType.NUMERICAL) {
-            if (binding.targetInput.text.isEmpty()) {
-                binding.targetInput.error = getString(R.string.validation_cannot_be_blank)
+            if (binding.targetInput.text.isNullOrEmpty()) {
+                binding.targetInputLayout.error = getString(R.string.validation_cannot_be_blank)
                 isValid = false
+            } else {
+                binding.targetInputLayout.error = null
             }
         }
         return isValid
@@ -357,11 +360,6 @@ class EditHabitActivity : AppCompatActivity() {
             window.statusBarColor = androidColor
             binding.toolbar.setBackgroundColor(androidColor)
         }
-    }
-
-    private fun getFormattedValidationError(@StringRes resId: Int): Spanned {
-        val html = "<font color=#FFFFFF>${getString(resId)}</font>"
-        return Html.fromHtml(html)
     }
 
     override fun onSaveInstanceState(state: Bundle) {
