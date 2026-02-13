@@ -91,8 +91,8 @@ class ListHabitsRootView @Inject constructor(
         
         val collapsingToolbarLayout = CollapsingToolbarLayout(context).apply {
             title = resources.getString(R.string.main_activity_title)
-            setExpandedTitleTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_HeadlineLarge)
-            setCollapsedTitleTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_TitleLarge)
+            setExpandedTitleTextAppearance(R.style.TextAppearance_App_Title_Expanded)
+            setCollapsedTitleTextAppearance(R.style.TextAppearance_App_Title_Collapsed)
             
             // Set scroll flags: Scroll | ExitUntilCollapsed
             val params = AppBarLayout.LayoutParams(

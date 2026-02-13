@@ -476,4 +476,7 @@
         <item name="colorOutlineVariant">@color/md_theme_outlineVariant</item>
     </style>
 
+    <style name="TextAppearance.App.Title.Expanded" parent="TextAppearance.Material3.DisplayLarge.Emphasized" />
+    <style name="TextAppearance.App.Title.Collapsed" parent="TextAppearance.Material3.TitleLarge.Emphasized" />
+
 </resources>
