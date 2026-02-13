@@ -57,8 +57,7 @@ class HeaderView(
 
     init {
         setScrollerBucketSize(dim(R.dimen.checkmarkWidth).toInt())
-        setBackgroundColor(sres.getColor(R.attr.headerBackgroundColor))
-        elevation = dp(2.0f)
+        setBackgroundColor(sres.getColor(com.google.android.material.R.attr.colorSurfaceContainer))
     }
 
     override fun atMidnight() {

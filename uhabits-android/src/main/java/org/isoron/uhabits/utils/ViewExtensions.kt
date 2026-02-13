@@ -174,7 +174,6 @@ fun View.setupToolbar(
     theme: Theme,
     displayHomeAsUpEnabled: Boolean = true
 ) {
-    toolbar.elevation = InterfaceUtils.dpToPixels(context, 2f)
     val res = StyledResources(context)
     toolbar.title = title
     val toolbarColor = if (!res.getBoolean(R.attr.useHabitColorAsPrimary)) {

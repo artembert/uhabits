@@ -83,7 +83,7 @@ class ListHabitsRootView @Inject constructor(
         hintView = HintView(context, hintList)
 
         val rootView = RelativeLayout(context).apply {
-            background = sres.getDrawable(R.attr.windowBackgroundColor)
+            background = sres.getDrawable(com.google.android.material.R.attr.colorSurfaceContainer)
             addAtTop(konfettiView)
             addAtTop(tbar)
             addBelow(header, tbar)
