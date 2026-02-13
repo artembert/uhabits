@@ -21,8 +21,11 @@ package org.isoron.uhabits.activities.habits.list
 
 import android.content.Context
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
+import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.FrameLayout
-import android.widget.RelativeLayout
+import androidx.coordinatorlayout.widget.CoordinatorLayout
+import com.google.android.material.appbar.AppBarLayout
+import com.google.android.material.appbar.CollapsingToolbarLayout
 import nl.dionsegijn.konfetti.xml.KonfettiView
 import org.isoron.uhabits.R
 import org.isoron.uhabits.activities.common.views.ScrollableChart
@@ -41,9 +44,6 @@ import org.isoron.uhabits.core.ui.screens.habits.list.HintListFactory
 import org.isoron.uhabits.core.utils.MidnightTimer
 import org.isoron.uhabits.inject.ActivityContext
 import org.isoron.uhabits.inject.ActivityScope
-import org.isoron.uhabits.utils.addAtBottom
-import org.isoron.uhabits.utils.addAtTop
-import org.isoron.uhabits.utils.addBelow
 import org.isoron.uhabits.utils.buildToolbar
 import org.isoron.uhabits.utils.currentTheme
 import org.isoron.uhabits.utils.dim
@@ -82,18 +82,87 @@ class ListHabitsRootView @Inject constructor(
         val hintList = hintListFactory.create(hints)
         hintView = HintView(context, hintList)
 
-        val rootView = RelativeLayout(context).apply {
-            background = sres.getDrawable(com.google.android.material.R.attr.colorSurfaceContainer)
-            addAtTop(konfettiView)
-            addAtTop(tbar)
-            addBelow(header, tbar)
-            addBelow(listView, header, height = MATCH_PARENT)
-            addBelow(llEmpty, header, height = MATCH_PARENT)
-            addBelow(progressBar, header) {
-                it.topMargin = dp(-6.0f).toInt()
-            }
-            addAtBottom(hintView)
+        val coordinatorLayout = CoordinatorLayout(context)
+        
+        val appBarLayout = AppBarLayout(context).apply {
+            background = null // Let background be handled by children or window
+            stateListAnimator = null // Remove shadow
         }
+        
+        val collapsingToolbarLayout = CollapsingToolbarLayout(context).apply {
+            title = resources.getString(R.string.main_activity_title)
+            setExpandedTitleTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_HeadlineLarge)
+            setCollapsedTitleTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_TitleLarge)
+            
+            // Set scroll flags: Scroll | ExitUntilCollapsed
+            val params = AppBarLayout.LayoutParams(
+                MATCH_PARENT,
+                dp(120f).toInt() // Expanded height approximation
+            ).apply {
+                scrollFlags = AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL or
+                        AppBarLayout.LayoutParams.SCROLL_FLAG_EXIT_UNTIL_COLLAPSED
+            }
+            layoutParams = params
+            
+            setContentScrimColor(sres.getColor(com.google.android.material.R.attr.colorSurfaceContainer))
+            setStatusBarScrimColor(sres.getColor(com.google.android.material.R.attr.colorSurfaceContainer))
+        }
+
+        // Toolbar
+        val toolbarParams = CollapsingToolbarLayout.LayoutParams(
+            MATCH_PARENT,
+            dim(R.dimen.abc_action_bar_default_height_material).toInt()
+        )
+        toolbarParams.setCollapseMode(CollapsingToolbarLayout.LayoutParams.COLLAPSE_MODE_PIN)
+        tbar.layoutParams = toolbarParams
+        collapsingToolbarLayout.addView(tbar)
+
+        appBarLayout.addView(collapsingToolbarLayout)
+        
+        // HeaderView (Calendar Strip) - Pinned below Collapsing Toolbar
+        header.layoutParams = AppBarLayout.LayoutParams(
+            MATCH_PARENT,
+            WRAP_CONTENT
+        )
+        appBarLayout.addView(header)
+
+        coordinatorLayout.addView(appBarLayout, MATCH_PARENT, WRAP_CONTENT)
+
+        // ListView
+        val listParams = CoordinatorLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT).apply {
+            behavior = AppBarLayout.ScrollingViewBehavior()
+        }
+        coordinatorLayout.addView(listView, listParams)
+
+        // Empty View
+        val emptyParams = CoordinatorLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT).apply {
+             behavior = AppBarLayout.ScrollingViewBehavior()
+             topMargin = dp(60f).toInt() // Push down slightly
+        }
+        coordinatorLayout.addView(llEmpty, emptyParams)
+
+        // Progress Bar - Anchor to AppBarLayout bottom? Or simple top placement.
+        // Original was below header. Here we can put it below AppBar.
+        val progressParams = CoordinatorLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT).apply {
+             behavior = AppBarLayout.ScrollingViewBehavior()
+             // Negative margin to overlap slightly or zero
+             topMargin = dp(-6.0f).toInt()
+        }
+        coordinatorLayout.addView(progressBar, progressParams)
+
+        // Hint View - Bottom
+        val hintParams = CoordinatorLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT).apply {
+            gravity = android.view.Gravity.BOTTOM
+        }
+        coordinatorLayout.addView(hintView, hintParams)
+        
+        // Konfetti - Top / Overlay
+        coordinatorLayout.addView(konfettiView, MATCH_PARENT, MATCH_PARENT)
+
+        val rootView = coordinatorLayout.apply {
+            background = sres.getDrawable(com.google.android.material.R.attr.colorSurfaceContainer)
+        }
+        
         rootView.setupToolbar(
             toolbar = tbar,
             title = resources.getString(R.string.main_activity_title),
