@@ -22,6 +22,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.ktlint.plugin)
+    alias(libs.plugins.kotlin.compose)
 }
 
 tasks.compileLint {
@@ -85,6 +86,7 @@ android {
 
     kotlinOptions.jvmTarget = JavaVersion.VERSION_17.toString()
     buildFeatures.viewBinding = true
+    buildFeatures.compose = true
     lint.abortOnError = false
 }
 
@@ -110,6 +112,16 @@ dependencies {
     implementation(libs.opencsv)
     implementation(libs.konfetti.xml)
     implementation(project(":uhabits-core"))
+    
+    // Compose
+    implementation(libs.androidx.activity.compose)
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.ui)
+    implementation(libs.androidx.ui.graphics)
+    implementation(libs.androidx.ui.tooling.preview)
+    implementation(libs.androidx.material3)
+    debugImplementation(libs.androidx.ui.tooling)
+    
     ksp(libs.dagger.compiler)
 
     androidTestImplementation(libs.bundles.androidTest)
