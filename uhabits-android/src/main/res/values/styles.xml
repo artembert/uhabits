@@ -161,7 +161,7 @@
         <item name="dialogFormLabelColor">@color/grey_800</item>
     </style>
 
-    <style name="BaseAlertDialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+    <style name="BaseAlertDialog" parent="ThemeOverlay.Material3Expressive.MaterialAlertDialog">
         <item name="contrast0">@color/white</item>
         <item name="contrast20">@color/grey_300</item>
         <item name="contrast40">@color/grey_350</item>
@@ -172,7 +172,7 @@
         <item name="dialogFormLabelColor">@color/white</item>
     </style>
 
-    <style name="BaseAlertDialogDark" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+    <style name="BaseAlertDialogDark" parent="ThemeOverlay.Material3Expressive.MaterialAlertDialog">
         <item name="contrast0">@color/grey_900</item>
         <item name="contrast20">@color/grey_800</item>
         <item name="contrast40">@color/grey_750</item>
@@ -449,7 +449,7 @@
         <item name="android:windowAnimationStyle">@null</item>
     </style>
 
-    <style name="Theme.App.M3" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Theme.App.M3" parent="Theme.Material3Expressive.DayNight.NoActionBar">
         <item name="colorPrimary">@color/md_theme_primary</item>
         <item name="colorOnPrimary">@color/md_theme_onPrimary</item>
         <item name="colorPrimaryContainer">@color/md_theme_primaryContainer</item>

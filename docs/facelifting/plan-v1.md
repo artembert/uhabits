@@ -27,7 +27,7 @@ This document outlines the step-by-step iterative migration of Loop Habit Tracke
 - **Verification**: Colors are accessible in layouts via `?attr/colorPrimary`, etc.
 
 ### 1.3 M3 Theme Setup (Side-by-Side)
-- **Task**: Create a new base theme `Theme.App.M3` inheriting from `Theme.Material3.DayNight.NoActionBar`.
+- **Task**: Create a new base theme `Theme.App.M3` inheriting from `Theme.Material3Expressive.DayNight.NoActionBar`.
 - **Verification**: Temporarily switch one Activity to use this theme and ensure it doesn't crash.
 
 ---
@@ -35,7 +35,7 @@ This document outlines the step-by-step iterative migration of Loop Habit Tracke
 ## Phase 2: Global Theme Transition
 
 ### 2.1 Base Theme Switch
-- **Task**: Update `AppBaseTheme` in `styles.xml` to inherit from `Theme.Material3.DayNight.NoActionBar`.
+- **Task**: Update `AppBaseTheme` in `styles.xml` to inherit from `Theme.Material3Expressive.DayNight.NoActionBar`.
 - **Warning**: This will immediately change the appearance of many components (e.g., larger buttons, different font sizes).
 - **Verification**: Run the app and identify immediate visual regressions (e.g., text contrast issues).
 

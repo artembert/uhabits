@@ -20,7 +20,7 @@ This document outlines a step-by-step iterative plan for migrating the UHabits A
     *   **Reasoning:** This is the foundational step to enable Material 3 components and styling.
 
 2.  **Update Root Application Theme:**
-    *   **Action:** In `uhabits-android/src/main/res/values/themes.xml` (or `styles.xml` if `themes.xml` doesn't exist or is not the primary theme file), change the parent of your main application theme. For example, replace `Theme.MaterialComponents.DayNight.NoActionBar` with `Theme.Material3.DayNight.NoActionBar`. Also, update any custom styles to inherit from `Widget.Material3.*` instead of `Widget.MaterialComponents.*` where appropriate.
+    *   **Action:** In `uhabits-android/src/main/res/values/themes.xml` (or `styles.xml` if `themes.xml` doesn't exist or is not the primary theme file), change the parent of your main application theme. For example, replace `Theme.MaterialComponents.DayNight.NoActionBar` with `Theme.Material3Expressive.DayNight.NoActionBar`. Also, update any custom styles to inherit from `Widget.Material3.*` or `Widget.Material3Expressive.*` instead of `Widget.MaterialComponents.*` where appropriate.
     *   **Reasoning:** This applies the default Material 3 styling to your entire application, affecting colors, shapes, and typography of most components automatically.
 
 3.  **Adopt Material 3 Color System (Initial):**
