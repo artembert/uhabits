@@ -44,4 +44,5 @@ Use this skill when you want to commit changes to the git repository.
 3.  **Confirm & Commit**:
     - Present the generated message to the user.
     - Ask for confirmation or edits.
+    - If not confirmed, stop execution.
     - If confirmed, run `git commit -m "<message>"`.
