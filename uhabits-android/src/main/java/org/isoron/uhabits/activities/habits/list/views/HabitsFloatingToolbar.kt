@@ -30,7 +30,7 @@ fun HabitsFloatingToolbar() {
         color = MaterialTheme.colorScheme.surfaceContainer,
         tonalElevation = 3.dp,
         shadowElevation = 3.dp,
-        modifier = Modifier.padding(bottom = 16.dp)
+        modifier = Modifier.padding(16.dp)
     ) {
         Row(
             modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp),
