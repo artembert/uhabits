@@ -94,10 +94,9 @@ The current navigation is fragmented or relies on older View-based menus. The `H
     -   Pass `activeScreen = ListHabitsActivity::class.java`.
     -   Expose callbacks: `var onSettingsClicked: () -> Unit = {}`, `var onAddClicked: () -> Unit = {}`.
     -   Invoke these callbacks from the Composable's actions.
--   Modify `uhabits-android/src/main/java/org/isoron/uhabits/activities/habits/list/ListHabitsScreen.kt`:
-    -   In `onAttached()` (or setup), set `rootView.get().onSettingsClicked`.
-    -   Call `behavior.get().onSettingsPressed()` (verify method name in `ListHabitsBehavior`) or `showSettingsScreen()` if direct access is needed.
-    -   Set `rootView.get().onAddClicked` and trigger habit creation flow (`showSelectHabitTypeDialog`).
+- Modify `uhabits-android/src/main/java/org/isoron/uhabits/activities/habits/list/ListHabitsScreen.kt`:
+    - In `onAttached()`, set `rootView.get().onSettingsClicked = { showSettingsScreen() }`.
+    - Set `rootView.get().onAddClicked = { showSelectHabitTypeDialog() }`.
 
 ### 3. Integrate into SettingsActivity
 -   Modify `uhabits-android/src/main/res/layout/settings_activity.xml`:
