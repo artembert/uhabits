@@ -15,7 +15,8 @@ FEATURE $1 $2
 
 - IMPORTANT: You're writing a plan to implement a net new feature based on the `Feature` that will add value to the application.
 - IMPORTANT: The `Feature` describes the feature that will be implemented but remember we're not implementing a new feature, we're creating the plan that will be used to implement the feature based on the `PRP Format` below.
-- Create the plan in the `PRPs/features/` directory with filename: `{descriptive-name}.md`
+- IMPORTANT: You might not modify source files
+- Create the plan in the `docs/PRPs/` directory with filename: `{descriptive-name}.md`
   - Replace `{descriptive-name}` with a short, descriptive name based on the feature (e.g., "add-auth-system", "implement-search", "create-dashboard")
 - Use the `PRP Format` below to create the plan.
 - Deeply research the codebase to understand existing patterns, architecture, and conventions before planning the feature.
@@ -27,22 +28,13 @@ FEATURE $1 $2
 - Deeply do web research to understand the latest trends and technologies in the field.
 - Figure out latest best practices and library documentation.
 - Include links to relevant resources and documentation with anchor tags for easy navigation.
-- If you need a new library, use `uv add <package>` and report it in the `Notes` section.
-- Read `CLAUDE.md` for project principles, logging rules, testing requirements, and docstring style.
+- Read `.gemini/GEMINI.md` for project principles, logging rules, testing requirements, and docstring style.
 - All code MUST have type annotations (strict mypy enforcement).
 - Use Google-style docstrings for all functions, classes, and modules.
-- Every new file in `src/` MUST have a corresponding test file in `tests/`.
-- Respect requested files in the `Relevant Files` section.
 
 ## Relevant Files
 
-Focus on the following files and vertical slice structure:
-
-**Core Files:**
-
-- `CLAUDE.md` - Project instructions, logging rules, testing requirements, docstring style
-  app/backend core files
-  app/frontend core files
+Core files and the file structure are listed in this file: `docs/project-overview.md`
 
 ## PRP Format
 
@@ -122,7 +114,7 @@ IMPORTANT: Execute every step in order, top to bottom.
 
 ## Testing Strategy
 
-See `CLAUDE.md` for complete testing requirements. Every file in `src/` must have a corresponding test file in `tests/`.
+See `./.gemini/GEMINI.md` for complete testing requirements. Every file in `src/` must have a corresponding test file in `tests/`.
 
 ### Unit Tests
 
@@ -140,32 +132,6 @@ See `CLAUDE.md` for complete testing requirements. Every file in `src/` must hav
 
 <list specific, measurable criteria that must be met for the feature to be considered complete>
 
-## Validation Commands
-
-Execute every command to validate the feature works correctly with zero regressions.
-
-<list commands you'll use to validate with 100% confidence the feature is implemented correctly with zero regressions. Include (example for BE Biome and TS checks are used for FE):
-
-- Linting: `uv run ruff check src/`
-- Type checking: `uv run mypy src/`
-- Unit tests: `uv run pytest tests/ -m unit -v`
-- Integration tests: `uv run pytest tests/ -m integration -v` (if applicable)
-- Full test suite: `uv run pytest tests/ -v`
-- Manual API testing if needed (curl commands, test requests)>
-
-**Required validation commands:**
-
-- `uv run ruff check src/` - Lint check must pass
-- `uv run mypy src/` - Type check must pass
-- `uv run pytest tests/ -v` - All tests must pass with zero regressions
-
-**Run server and test core endpoints:**
-
-- Start server: @.claude/start-server
-- Test endpoints with curl (at minimum: health check, main functionality)
-- Verify structured logs show proper correlation IDs and context
-- Stop server after validation
-
 ## Notes
 
 <optionally list any additional notes, future considerations, or context that are relevant to the feature that will be helpful to the developer>
@@ -178,4 +144,4 @@ Extract the feature details from the `issue_json` variable (parse the JSON and u
 ## Report
 
 - Summarize the work you've just done in a concise bullet point list.
-- Include the full path to the plan file you created (e.g., `PRPs/features/add-auth-system.md`)
+- Include the full path to the plan file you created (e.g., `/docs/PRPs/add-auth-system.md`)
