@@ -183,7 +183,7 @@ class ListHabitsRootView @Inject constructor(
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 MaterialTheme {
-                    HabitsFloatingToolbar()
+                    HabitsFloatingToolbar(isHabitsActive = true)
                 }
             }
         }
