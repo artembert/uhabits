@@ -36,4 +36,7 @@
     <color name="md_theme_surfaceContainer">#F3EDF7</color>
     <color name="md_theme_surfaceContainerHigh">#ECE6F0</color>
     <color name="md_theme_surfaceContainerHighest">#E6E0E9</color>
+
+    <!-- M3 Dark Theme Colors (Fixed) -->
+    <color name="md_theme_dark_surface">#141218</color>
 </resources>

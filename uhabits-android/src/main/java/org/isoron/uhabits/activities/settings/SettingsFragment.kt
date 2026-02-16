@@ -109,7 +109,7 @@ class SettingsFragment : PreferenceFragmentCompat(), OnSharedPreferenceChangeLis
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val sr = StyledResources(context!!)
-        view.setBackgroundColor(sr.getColor(R.attr.contrast0))
+        view.setBackgroundColor(sr.getColor(com.google.android.material.R.attr.colorSurface))
         super.onViewCreated(view, savedInstanceState)
     }
 
