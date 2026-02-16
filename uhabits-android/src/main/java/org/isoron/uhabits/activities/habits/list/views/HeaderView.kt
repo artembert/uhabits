@@ -120,7 +120,7 @@ class HeaderView(
             val em = paint.measureText("m")
 
             repeat(buttonCount) { index ->
-                rect.set(0f, 0f, width, height)
+                rect.set(dp(20f), 0f, 0f, height)
                 rect.offset(canvas.width.toFloat() - dp(3.0f), 0f)
 
                 if (isReversed) {
