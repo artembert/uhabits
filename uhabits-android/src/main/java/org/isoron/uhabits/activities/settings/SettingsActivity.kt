@@ -21,17 +21,31 @@ package org.isoron.uhabits.activities.settings
 import android.os.Bundle
 import android.view.LayoutInflater
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
+import androidx.compose.ui.res.stringResource
 import org.isoron.uhabits.HabitsApplication
 import org.isoron.uhabits.R
 import org.isoron.uhabits.activities.AndroidThemeSwitcher
 import org.isoron.uhabits.activities.common.views.FloatingToolbarNavigation
 import org.isoron.uhabits.activities.habits.edit.HabitTypeDialog
-import org.isoron.uhabits.core.models.PaletteColor
+import org.isoron.uhabits.core.ui.views.DarkTheme
+import org.isoron.uhabits.core.ui.views.PureBlackTheme
 import org.isoron.uhabits.databinding.SettingsActivityBinding
 import org.isoron.uhabits.utils.applyRootViewInsets
-import org.isoron.uhabits.utils.setupToolbar
 
+@OptIn(ExperimentalMaterial3Api::class)
 class SettingsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,14 +54,27 @@ class SettingsActivity : AppCompatActivity() {
         themeSwitcher.apply()
 
         val binding = SettingsActivityBinding.inflate(LayoutInflater.from(this))
-        binding.root.setupToolbar(
-            toolbar = binding.toolbar,
-            title = resources.getString(R.string.settings),
-            color = PaletteColor(11),
-            theme = themeSwitcher.currentTheme
-        )
         binding.root.applyRootViewInsets()
         setContentView(binding.root)
+
+        binding.toolbarCompose.setContent {
+            val isDark = themeSwitcher.currentTheme is DarkTheme || themeSwitcher.currentTheme is PureBlackTheme
+            val colorScheme = if (isDark) darkColorScheme() else lightColorScheme()
+            MaterialTheme(colorScheme = colorScheme) {
+                TopAppBar(
+                    title = { Text(stringResource(R.string.settings)) },
+                    navigationIcon = {
+                        IconButton(onClick = { finish() }) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        }
+                    },
+                    windowInsets = WindowInsets.statusBars,
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.surface
+                    )
+                )
+            }
+        }
 
         binding.composeView.setContent {
             MaterialTheme {
