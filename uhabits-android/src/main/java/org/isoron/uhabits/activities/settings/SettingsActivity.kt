@@ -21,9 +21,12 @@ package org.isoron.uhabits.activities.settings
 import android.os.Bundle
 import android.view.LayoutInflater
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.material3.MaterialTheme
 import org.isoron.uhabits.HabitsApplication
 import org.isoron.uhabits.R
 import org.isoron.uhabits.activities.AndroidThemeSwitcher
+import org.isoron.uhabits.activities.common.views.FloatingToolbarNavigation
+import org.isoron.uhabits.activities.habits.edit.HabitTypeDialog
 import org.isoron.uhabits.core.models.PaletteColor
 import org.isoron.uhabits.databinding.SettingsActivityBinding
 import org.isoron.uhabits.utils.applyRootViewInsets
@@ -45,5 +48,18 @@ class SettingsActivity : AppCompatActivity() {
         )
         binding.root.applyRootViewInsets()
         setContentView(binding.root)
+
+        binding.composeView.setContent {
+            MaterialTheme {
+                FloatingToolbarNavigation(
+                    activeScreen = SettingsActivity::class.java,
+                    onListClick = { finish() },
+                    onAddClick = {
+                        val dialog = HabitTypeDialog()
+                        dialog.show(supportFragmentManager, "habitType")
+                    }
+                )
+            }
+        }
     }
 }

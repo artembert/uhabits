@@ -31,6 +31,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceCategory
@@ -49,7 +51,7 @@ import org.isoron.uhabits.core.utils.DateUtils.Companion.getLongWeekdayNames
 import org.isoron.uhabits.notifications.AndroidNotificationTray.Companion.createAndroidNotificationChannel
 import org.isoron.uhabits.notifications.RingtoneManager
 import org.isoron.uhabits.utils.StyledResources
-import org.isoron.uhabits.utils.applyBottomInset
+import org.isoron.uhabits.utils.dp
 import org.isoron.uhabits.utils.startActivitySafely
 import org.isoron.uhabits.widgets.WidgetUpdater
 import java.util.Calendar
@@ -116,8 +118,15 @@ class SettingsFragment : PreferenceFragmentCompat(), OnSharedPreferenceChangeLis
         parent: ViewGroup?,
         savedInstanceState: Bundle?,
     ): RecyclerView? {
-        return super.onCreateRecyclerView(inflater, parent, savedInstanceState)
-            .also { it.applyBottomInset() }
+        val recyclerView = super.onCreateRecyclerView(inflater, parent, savedInstanceState)
+        recyclerView.clipToPadding = false
+        ViewCompat.setOnApplyWindowInsetsListener(recyclerView) { view, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            val extraPadding = view.dp(92f).toInt()
+            view.setPadding(0, 0, 0, systemBars.bottom + extraPadding)
+            insets
+        }
+        return recyclerView
     }
 
     override fun onPreferenceTreeClick(preference: Preference): Boolean {
