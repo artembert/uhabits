@@ -1,4 +1,4 @@
-package org.isoron.uhabits.activities.habits.list.views
+package org.isoron.uhabits.activities.common.views
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -24,9 +24,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import org.isoron.uhabits.R
+import org.isoron.uhabits.activities.habits.list.ListHabitsActivity
+import org.isoron.uhabits.activities.settings.SettingsActivity
 
 @Composable
-fun HabitsFloatingToolbar(isHabitsActive: Boolean = false) {
+fun FloatingToolbarNavigation(
+    activeScreen: Class<*>,
+    onListClick: () -> Unit = {},
+    onAddClick: () -> Unit = {},
+    onSettingsClick: () -> Unit = {}
+) {
     Surface(
         shape = CircleShape,
         color = MaterialTheme.colorScheme.surfaceContainer,
@@ -35,12 +42,12 @@ fun HabitsFloatingToolbar(isHabitsActive: Boolean = false) {
         modifier = Modifier.padding(16.dp)
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp),
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            if (isHabitsActive) {
-                FilledTonalButton(onClick = { /* Placeholder */ }) {
+            if (activeScreen == ListHabitsActivity::class.java) {
+                FilledTonalButton(onClick = onListClick) {
                     Icon(
                         Icons.AutoMirrored.Filled.List,
                         contentDescription = stringResource(R.string.main_activity_title)
@@ -49,7 +56,7 @@ fun HabitsFloatingToolbar(isHabitsActive: Boolean = false) {
                     Text(stringResource(R.string.main_activity_title))
                 }
             } else {
-                TextButton(onClick = { /* Placeholder */ }) {
+                TextButton(onClick = onListClick) {
                     Icon(
                         Icons.AutoMirrored.Filled.List,
                         contentDescription = stringResource(R.string.main_activity_title)
@@ -62,7 +69,7 @@ fun HabitsFloatingToolbar(isHabitsActive: Boolean = false) {
             Spacer(modifier = Modifier.width(8.dp))
 
             FloatingActionButton(
-                onClick = { /* Placeholder */ },
+                onClick = onAddClick,
                 containerColor = MaterialTheme.colorScheme.surfaceContainer,
                 contentColor = MaterialTheme.colorScheme.primary,
                 shape = CircleShape,
@@ -76,13 +83,24 @@ fun HabitsFloatingToolbar(isHabitsActive: Boolean = false) {
 
             Spacer(modifier = Modifier.width(8.dp))
 
-            TextButton(onClick = { /* Placeholder */ }) {
-                Icon(
-                    Icons.Filled.Settings,
-                    contentDescription = stringResource(R.string.action_settings)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(stringResource(R.string.action_settings))
+            if (activeScreen == SettingsActivity::class.java) {
+                FilledTonalButton(onClick = onSettingsClick) {
+                    Icon(
+                        Icons.Filled.Settings,
+                        contentDescription = stringResource(R.string.action_settings)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(stringResource(R.string.action_settings))
+                }
+            } else {
+                TextButton(onClick = onSettingsClick) {
+                    Icon(
+                        Icons.Filled.Settings,
+                        contentDescription = stringResource(R.string.action_settings)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(stringResource(R.string.action_settings))
+                }
             }
         }
     }

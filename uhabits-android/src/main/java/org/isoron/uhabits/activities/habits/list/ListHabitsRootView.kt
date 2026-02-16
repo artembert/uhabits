@@ -38,7 +38,7 @@ import org.isoron.uhabits.activities.habits.list.views.EmptyListView
 import org.isoron.uhabits.activities.habits.list.views.HabitCardListAdapter
 import org.isoron.uhabits.activities.habits.list.views.HabitCardListView
 import org.isoron.uhabits.activities.habits.list.views.HabitCardListViewFactory
-import org.isoron.uhabits.activities.habits.list.views.HabitsFloatingToolbar
+import org.isoron.uhabits.activities.common.views.FloatingToolbarNavigation
 import org.isoron.uhabits.activities.habits.list.views.HeaderView
 import org.isoron.uhabits.activities.habits.list.views.HintView
 import org.isoron.uhabits.core.models.ModelObservable
@@ -183,7 +183,9 @@ class ListHabitsRootView @Inject constructor(
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 MaterialTheme {
-                    HabitsFloatingToolbar(isHabitsActive = true)
+                    FloatingToolbarNavigation(
+                        activeScreen = ListHabitsActivity::class.java
+                    )
                 }
             }
         }
