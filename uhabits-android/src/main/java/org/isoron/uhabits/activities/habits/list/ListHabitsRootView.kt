@@ -39,6 +39,7 @@ import org.isoron.uhabits.activities.habits.list.views.HabitCardListAdapter
 import org.isoron.uhabits.activities.habits.list.views.HabitCardListView
 import org.isoron.uhabits.activities.habits.list.views.HabitCardListViewFactory
 import org.isoron.uhabits.activities.common.views.FloatingToolbarNavigation
+import org.isoron.uhabits.activities.common.views.AppTheme
 import org.isoron.uhabits.activities.habits.list.views.HeaderView
 import org.isoron.uhabits.activities.habits.list.views.HintView
 import org.isoron.uhabits.core.models.ModelObservable
@@ -46,11 +47,12 @@ import org.isoron.uhabits.core.models.PaletteColor
 import org.isoron.uhabits.core.preferences.Preferences
 import org.isoron.uhabits.core.tasks.TaskRunner
 import org.isoron.uhabits.core.ui.screens.habits.list.HintListFactory
+import org.isoron.uhabits.core.ui.ThemeSwitcher
+import org.isoron.uhabits.core.ui.views.LightTheme
 import org.isoron.uhabits.core.utils.MidnightTimer
 import org.isoron.uhabits.inject.ActivityContext
 import org.isoron.uhabits.inject.ActivityScope
 import org.isoron.uhabits.utils.buildToolbar
-import org.isoron.uhabits.utils.currentTheme
 import org.isoron.uhabits.utils.dim
 import org.isoron.uhabits.utils.dp
 import org.isoron.uhabits.utils.setupToolbar
@@ -69,7 +71,8 @@ class ListHabitsRootView @Inject constructor(
     midnightTimer: MidnightTimer,
     runner: TaskRunner,
     private val listAdapter: HabitCardListAdapter,
-    habitCardListViewFactory: HabitCardListViewFactory
+    habitCardListViewFactory: HabitCardListViewFactory,
+    private val themeSwitcher: ThemeSwitcher
 ) : FrameLayout(context), ModelObservable.Listener {
 
     interface Listener {
@@ -188,7 +191,7 @@ class ListHabitsRootView @Inject constructor(
             title = resources.getString(R.string.main_activity_title),
             color = PaletteColor(17),
             displayHomeAsUpEnabled = false,
-            theme = currentTheme()
+            theme = themeSwitcher.currentTheme ?: LightTheme()
         )
         addView(rootView, MATCH_PARENT, MATCH_PARENT)
         listAdapter.setListView(listView)
@@ -196,7 +199,7 @@ class ListHabitsRootView @Inject constructor(
         val composeView = ComposeView(context).apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                MaterialTheme {
+                AppTheme(theme = themeSwitcher.currentTheme ?: LightTheme()) {
                     FloatingToolbarNavigation(
                         activeScreen = ListHabitsActivity::class.java,
                         onSettingsClick = { listener?.onSettingsClicked() },

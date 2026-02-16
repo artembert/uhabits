@@ -32,16 +32,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.ui.res.stringResource
 import org.isoron.uhabits.HabitsApplication
 import org.isoron.uhabits.R
 import org.isoron.uhabits.activities.AndroidThemeSwitcher
+import org.isoron.uhabits.activities.common.views.AppTheme
 import org.isoron.uhabits.activities.common.views.FloatingToolbarNavigation
 import org.isoron.uhabits.activities.habits.edit.HabitTypeDialog
-import org.isoron.uhabits.core.ui.views.DarkTheme
-import org.isoron.uhabits.core.ui.views.PureBlackTheme
 import org.isoron.uhabits.databinding.SettingsActivityBinding
 import org.isoron.uhabits.utils.applyRootViewInsets
 
@@ -58,9 +55,7 @@ class SettingsActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         binding.toolbarCompose.setContent {
-            val isDark = themeSwitcher.currentTheme is DarkTheme || themeSwitcher.currentTheme is PureBlackTheme
-            val colorScheme = if (isDark) darkColorScheme() else lightColorScheme()
-            MaterialTheme(colorScheme = colorScheme) {
+            AppTheme(theme = themeSwitcher.currentTheme) {
                 TopAppBar(
                     title = { Text(stringResource(R.string.settings)) },
                     navigationIcon = {
@@ -77,7 +72,7 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         binding.composeView.setContent {
-            MaterialTheme {
+            AppTheme(theme = themeSwitcher.currentTheme) {
                 FloatingToolbarNavigation(
                     activeScreen = SettingsActivity::class.java,
                     onListClick = { finish() },

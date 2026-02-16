@@ -71,7 +71,15 @@
     <style name="AppBaseThemeDark" parent="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar">
         <item name="aboutScreenColor">@color/blue_300</item>
         <item name="actionModeBackground">@color/grey_800</item>
-        <item name="colorSurface">@color/md_theme_dark_surface</item>
+        <item name="colorSurface">@color/grey_900</item>
+        <item name="colorOnSurface">@color/grey_100</item>
+        <item name="colorPrimary">@color/grey_950</item>
+        <item name="colorOnPrimary">@color/grey_100</item>
+        <item name="colorSecondaryContainer">@color/grey_800</item>
+        <item name="colorOnSecondaryContainer">@color/grey_200</item>
+        <item name="colorSurfaceContainer">@color/grey_850</item>
+        <item name="colorSurfaceVariant">@color/grey_800</item>
+        <item name="colorOnSurfaceVariant">@color/grey_300</item>
         <item name="android:alertDialogTheme">@style/BaseAlertDialogDark</item>
         <item name="android:dialogTheme">@style/BaseAlertDialogDark</item>
         <item name="materialAlertDialogTheme">@style/BaseAlertDialogDark</item>
@@ -80,7 +88,6 @@
         <item name="cardBackground">@drawable/card_dark_background</item>
         <item name="cardBgColor">@color/grey_850</item>
         <item name="colorAccent">?aboutScreenColor</item>
-        <item name="colorPrimary">@color/grey_950</item>
         <item name="colorPrimaryDark">@color/black</item>
         <item name="dialogIconChangeColor">@drawable/ic_action_color_dark</item>
         <item name="headerBackgroundColor">@color/grey_900</item>
@@ -124,6 +131,12 @@
         <item name="cardBackground">@drawable/card_amoled_background</item>
         <item name="cardBgColor">@color/black</item>
         <item name="colorSurface">@color/black</item>
+        <item name="colorOnSurface">@color/grey_200</item>
+        <item name="colorSurfaceContainer">@color/black</item>
+        <item name="colorSurfaceVariant">@color/black</item>
+        <item name="colorOnSurfaceVariant">@color/grey_400</item>
+        <item name="colorSecondaryContainer">@color/grey_950</item>
+        <item name="colorOnSecondaryContainer">@color/grey_200</item>
         <item name="colorPrimary">@color/black</item>
         <item name="colorPrimaryDark">@color/black</item>
         <item name="headerBackgroundColor">@color/black</item>
