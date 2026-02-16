@@ -106,16 +106,26 @@ class ListHabitsScreen
 ) : CommandRunner.Listener,
     ListHabitsBehavior.Screen,
     ListHabitsMenuBehavior.Screen,
-    ListHabitsSelectionMenuBehavior.Screen {
+    ListHabitsSelectionMenuBehavior.Screen,
+    ListHabitsRootView.Listener {
 
     val activity = (context as AppCompatActivity)
 
     fun onAttached() {
         commandRunner.addListener(this)
+        rootView.get().setListener(this)
     }
 
     fun onDetached() {
         commandRunner.removeListener(this)
+    }
+
+    override fun onSettingsClicked() {
+        showSettingsScreen()
+    }
+
+    override fun onAddClicked() {
+        showSelectHabitTypeDialog()
     }
 
     override fun onCommandFinished(command: Command) {

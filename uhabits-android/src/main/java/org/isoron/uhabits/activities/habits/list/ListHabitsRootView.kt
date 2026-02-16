@@ -72,7 +72,21 @@ class ListHabitsRootView @Inject constructor(
     habitCardListViewFactory: HabitCardListViewFactory
 ) : FrameLayout(context), ModelObservable.Listener {
 
-    val listView: HabitCardListView = habitCardListViewFactory.create()
+    interface Listener {
+        fun onSettingsClicked()
+        fun onAddClicked()
+    }
+
+    private var listener: Listener? = null
+
+    fun setListener(listener: Listener) {
+        this.listener = listener
+    }
+
+    val listView: HabitCardListView = habitCardListViewFactory.create().apply {
+        clipToPadding = false
+        setPadding(0, 0, 0, dp(100f).toInt())
+    }
     val llEmpty = EmptyListView(context)
     val tbar = buildToolbar()
     val konfettiView = KonfettiView(context).apply {
@@ -88,18 +102,18 @@ class ListHabitsRootView @Inject constructor(
         hintView = HintView(context, hintList)
 
         val coordinatorLayout = CoordinatorLayout(context)
-        
+
         val appBarLayout = AppBarLayout(context).apply {
             background = null // Let background be handled by children or window
             stateListAnimator = null // Remove shadow
             fitsSystemWindows = true // Ensure content starts below status bar
         }
-        
+
         val collapsingToolbarLayout = CollapsingToolbarLayout(context).apply {
             title = resources.getString(R.string.main_activity_title)
             setExpandedTitleTextAppearance(R.style.TextAppearance_App_Title_Expanded)
             setCollapsedTitleTextAppearance(R.style.TextAppearance_App_Title_Collapsed)
-            
+
             // Set scroll flags: Scroll | ExitUntilCollapsed
             val params = AppBarLayout.LayoutParams(
                 MATCH_PARENT,
@@ -109,7 +123,7 @@ class ListHabitsRootView @Inject constructor(
                         AppBarLayout.LayoutParams.SCROLL_FLAG_EXIT_UNTIL_COLLAPSED
             }
             layoutParams = params
-            
+
             setContentScrimColor(sres.getColor(com.google.android.material.R.attr.colorSurfaceContainer))
             setStatusBarScrimColor(sres.getColor(com.google.android.material.R.attr.colorSurfaceContainer))
         }
@@ -124,7 +138,7 @@ class ListHabitsRootView @Inject constructor(
         collapsingToolbarLayout.addView(tbar)
 
         appBarLayout.addView(collapsingToolbarLayout)
-        
+
         // HeaderView (Calendar Strip) - Pinned below Collapsing Toolbar
         header.layoutParams = AppBarLayout.LayoutParams(
             MATCH_PARENT,
@@ -142,17 +156,17 @@ class ListHabitsRootView @Inject constructor(
 
         // Empty View
         val emptyParams = CoordinatorLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT).apply {
-             behavior = AppBarLayout.ScrollingViewBehavior()
-             topMargin = dp(60f).toInt() // Push down slightly
+            behavior = AppBarLayout.ScrollingViewBehavior()
+            topMargin = dp(60f).toInt() // Push down slightly
         }
         coordinatorLayout.addView(llEmpty, emptyParams)
 
         // Progress Bar - Anchor to AppBarLayout bottom? Or simple top placement.
         // Original was below header. Here we can put it below AppBar.
         val progressParams = CoordinatorLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT).apply {
-             behavior = AppBarLayout.ScrollingViewBehavior()
-             // Negative margin to overlap slightly or zero
-             topMargin = dp(-6.0f).toInt()
+            behavior = AppBarLayout.ScrollingViewBehavior()
+            // Negative margin to overlap slightly or zero
+            topMargin = dp(-6.0f).toInt()
         }
         coordinatorLayout.addView(progressBar, progressParams)
 
@@ -161,14 +175,14 @@ class ListHabitsRootView @Inject constructor(
             gravity = android.view.Gravity.BOTTOM
         }
         coordinatorLayout.addView(hintView, hintParams)
-        
+
         // Konfetti - Top / Overlay
         coordinatorLayout.addView(konfettiView, MATCH_PARENT, MATCH_PARENT)
 
         val rootView = coordinatorLayout.apply {
             background = sres.getDrawable(com.google.android.material.R.attr.colorSurfaceContainer)
         }
-        
+
         rootView.setupToolbar(
             toolbar = tbar,
             title = resources.getString(R.string.main_activity_title),
@@ -184,7 +198,9 @@ class ListHabitsRootView @Inject constructor(
             setContent {
                 MaterialTheme {
                     FloatingToolbarNavigation(
-                        activeScreen = ListHabitsActivity::class.java
+                        activeScreen = ListHabitsActivity::class.java,
+                        onSettingsClick = { listener?.onSettingsClicked() },
+                        onAddClick = { listener?.onAddClicked() }
                     )
                 }
             }
