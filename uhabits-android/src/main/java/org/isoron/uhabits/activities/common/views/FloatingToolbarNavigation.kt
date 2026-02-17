@@ -21,6 +21,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import org.isoron.uhabits.R
@@ -46,25 +47,13 @@ fun FloatingToolbarNavigation(
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            if (activeScreen == ListHabitsActivity::class.java) {
-                FilledTonalButton(onClick = onListClick) {
-                    Icon(
-                        Icons.AutoMirrored.Filled.List,
-                        contentDescription = stringResource(R.string.main_activity_title)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(stringResource(R.string.main_activity_title))
-                }
-            } else {
-                TextButton(onClick = onListClick) {
-                    Icon(
-                        Icons.AutoMirrored.Filled.List,
-                        contentDescription = stringResource(R.string.main_activity_title)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(stringResource(R.string.main_activity_title))
-                }
-            }
+            NavButton(
+                selected = activeScreen == ListHabitsActivity::class.java,
+                icon = Icons.AutoMirrored.Filled.List,
+                contentDescription = stringResource(R.string.main_activity_title),
+                label = stringResource(R.string.main_activity_title),
+                onClick = onListClick
+            )
 
             Spacer(modifier = Modifier.width(8.dp))
 
@@ -83,25 +72,32 @@ fun FloatingToolbarNavigation(
 
             Spacer(modifier = Modifier.width(8.dp))
 
-            if (activeScreen == SettingsActivity::class.java) {
-                FilledTonalButton(onClick = onSettingsClick) {
-                    Icon(
-                        Icons.Filled.Settings,
-                        contentDescription = stringResource(R.string.action_settings)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(stringResource(R.string.action_settings))
-                }
-            } else {
-                TextButton(onClick = onSettingsClick) {
-                    Icon(
-                        Icons.Filled.Settings,
-                        contentDescription = stringResource(R.string.action_settings)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(stringResource(R.string.action_settings))
-                }
-            }
+            NavButton(
+                selected = activeScreen == SettingsActivity::class.java,
+                icon = Icons.Filled.Settings,
+                contentDescription = stringResource(R.string.action_settings),
+                label = stringResource(R.string.action_settings),
+                onClick = onSettingsClick
+            )
         }
     }
+}
+
+@Composable
+private fun NavButton(
+    selected: Boolean,
+    onClick: () -> Unit,
+    icon: ImageVector,
+    contentDescription: String,
+    label: String
+) {
+    val content: @Composable () -> Unit = {
+        Icon(icon, contentDescription = contentDescription)
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(label)
+    }
+    if (selected) {
+        return FilledTonalButton(onClick = onClick, content = { content() })
+    }
+    return TextButton(onClick = onClick, content = { content() })
 }
