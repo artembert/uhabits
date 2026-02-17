@@ -10,11 +10,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilledTonalButton
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedIconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -37,13 +37,13 @@ fun FloatingToolbarNavigation(
 ) {
     Surface(
         shape = CircleShape,
-        color = MaterialTheme.colorScheme.surfaceContainer,
+        color = MaterialTheme.colorScheme.surfaceContainerHigh,
         tonalElevation = 3.dp,
         shadowElevation = 3.dp,
         modifier = Modifier.padding(16.dp)
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -57,12 +57,9 @@ fun FloatingToolbarNavigation(
 
             Spacer(modifier = Modifier.width(8.dp))
 
-            FloatingActionButton(
+            OutlinedIconButton(
                 onClick = onAddClick,
-                containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                contentColor = MaterialTheme.colorScheme.primary,
                 shape = CircleShape,
-                elevation = FloatingActionButtonDefaults.elevation(0.dp, 0.dp)
             ) {
                 Icon(
                     Icons.Filled.Add,
@@ -99,5 +96,11 @@ private fun NavButton(
     if (selected) {
         return FilledTonalButton(onClick = onClick, content = { content() })
     }
-    return TextButton(onClick = onClick, content = { content() })
+    return TextButton(
+        onClick = onClick,
+        colors = ButtonDefaults.textButtonColors(
+            contentColor = MaterialTheme.colorScheme.onSurface
+        ),
+        content = { content() }
+    )
 }
