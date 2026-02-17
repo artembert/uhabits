@@ -22,7 +22,7 @@ Plan file: $ARGUMENTS
 
 ## When done
 
-- Move the PRP file to the completed directory in /docs/PRPs/completed
+- Move the PRP file to the completed directory in /docs/PRPs
 
 ## Report
 
