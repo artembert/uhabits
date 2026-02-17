@@ -86,7 +86,7 @@
         <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
         <item name="android:textColor">@color/grey_100</item>
         <item name="cardBackground">@drawable/card_dark_background</item>
-        <item name="cardBgColor">@color/grey_850</item>
+        <item name="cardBgColor">@color/grey_900</item>
         <item name="colorAccent">?aboutScreenColor</item>
         <item name="colorPrimaryDark">@color/black</item>
         <item name="dialogIconChangeColor">@drawable/ic_action_color_dark</item>
