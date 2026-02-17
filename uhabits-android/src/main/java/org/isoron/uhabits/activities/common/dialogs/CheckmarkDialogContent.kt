@@ -1,29 +1,24 @@
 package org.isoron.uhabits.activities.common.dialogs
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Help
 import androidx.compose.material.icons.filled.SkipNext
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -37,60 +32,73 @@ import org.isoron.uhabits.core.models.Entry.Companion.YES_MANUAL
 @Composable
 fun CheckmarkDialogContent(
     notes: String,
+    habitName: String,
     onNotesChanged: (String) -> Unit,
     onAction: (Int) -> Unit,
+    onDismissRequest: () -> Unit,
     primaryColor: Color,
     skipEnabled: Boolean = true,
     unknownEnabled: Boolean = true
 ) {
-    Surface(
-        shape = MaterialTheme.shapes.extraLarge,
-        color = MaterialTheme.colorScheme.surfaceContainerHigh,
-        modifier = Modifier
-            .width(280.dp)
-            .wrapContentHeight()
-    ) {
-        Column(
-            modifier = Modifier.padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            OutlinedTextField(
-                value = notes,
-                onValueChange = onNotesChanged,
-                label = { Text(stringResource(R.string.notes)) },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = false,
-                maxLines = 3
-            )
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
+    AlertDialog(
+        onDismissRequest = onDismissRequest,
+        title = {
+            Text(text = stringResource(R.string.default_reminder_question))
+        },
+        text = {
+            Column {
+                Text(text = habitName, style = MaterialTheme.typography.bodyLarge)
+                Spacer(modifier = Modifier.width(8.dp))
+                OutlinedTextField(
+                    value = notes,
+                    onValueChange = onNotesChanged,
+                    label = { Text(stringResource(R.string.notes)) },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = false,
+                    maxLines = 3
+                )
+            }
+        },
+        confirmButton = {
+            FilledTonalButton(
+                onClick = { onAction(YES_MANUAL) },
+                colors = ButtonDefaults.filledTonalButtonColors(
+                    containerColor = primaryColor
+                )
             ) {
-                FilledTonalButton(
-                    onClick = { onAction(YES_MANUAL) },
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Check,
-                        contentDescription = stringResource(R.string.check)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(stringResource(R.string.check))
+                Icon(
+                    imageVector = Icons.Default.Check,
+                    contentDescription = stringResource(R.string.check)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(text = stringResource(R.string.check))
+            }
+        },
+        dismissButton = {
+            Row {
+                if (unknownEnabled) {
+                    FilledTonalButton(
+                        onClick = { onAction(UNKNOWN) },
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.Help,
+                            contentDescription = stringResource(R.string.question)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(text = stringResource(R.string.question))
+                    }
                 }
 
                 if (skipEnabled) {
-                    IconButton(
+                    Button(
                         onClick = { onAction(SKIP) },
-                        colors = IconButtonDefaults.iconButtonColors(
-                            contentColor = primaryColor
-                        )
                     ) {
                         Icon(
                             imageVector = Icons.Default.SkipNext,
                             contentDescription = stringResource(R.string.skip_day)
                         )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(text = stringResource(R.string.skip_day))
                     }
                 }
 
@@ -102,23 +110,9 @@ fun CheckmarkDialogContent(
                         contentDescription = stringResource(R.string.no)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text(stringResource(R.string.no))
-                }
-
-                if (unknownEnabled) {
-                    IconButton(
-                        onClick = { onAction(UNKNOWN) },
-                        colors = IconButtonDefaults.iconButtonColors(
-                            contentColor = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Help,
-                            contentDescription = stringResource(R.string.question)
-                        )
-                    }
+                    Text(text = stringResource(R.string.no))
                 }
             }
         }
-    }
+    )
 }

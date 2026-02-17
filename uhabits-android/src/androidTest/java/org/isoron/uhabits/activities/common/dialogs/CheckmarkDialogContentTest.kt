@@ -43,15 +43,14 @@ class CheckmarkDialogContentTest {
                 notes = "Initial Note",
                 onNotesChanged = {},
                 onAction = {},
+                onDismissRequest = {},
+                habitName = "Wake up before 8",
                 primaryColor = Color.Blue
             )
         }
 
+        composeTestRule.onNodeWithText("Checkmark").assertIsDisplayed()
         composeTestRule.onNodeWithText("Initial Note").assertIsDisplayed()
-        // Content descriptions come from string resources. 
-        // We assume English locale for tests or check existence by other means if needed.
-        // But verifying by content description is best practice.
-        // Strings: Check, Skip, No, Question
         composeTestRule.onNodeWithContentDescription("Check").assertIsDisplayed()
         composeTestRule.onNodeWithContentDescription("Skip").assertIsDisplayed()
         composeTestRule.onNodeWithContentDescription("No").assertIsDisplayed()
@@ -66,6 +65,8 @@ class CheckmarkDialogContentTest {
                 notes = "",
                 onNotesChanged = { capturedNotes = it },
                 onAction = {},
+                onDismissRequest = {},
+                habitName = "Wake up before 8",
                 primaryColor = Color.Blue
             )
         }
@@ -82,6 +83,8 @@ class CheckmarkDialogContentTest {
                 notes = "",
                 onNotesChanged = {},
                 onAction = { capturedAction = it },
+                onDismissRequest = {},
+                habitName = "Wake up before 8",
                 primaryColor = Color.Blue
             )
         }

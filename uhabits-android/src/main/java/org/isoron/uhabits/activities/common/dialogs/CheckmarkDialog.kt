@@ -33,9 +33,6 @@ import androidx.compose.ui.platform.ViewCompositionStrategy
 import org.isoron.uhabits.HabitsApplication
 import org.isoron.uhabits.activities.AndroidThemeSwitcher
 import org.isoron.uhabits.activities.common.views.AppTheme
-import org.isoron.uhabits.core.ui.views.DarkTheme
-import org.isoron.uhabits.core.ui.views.LightTheme
-import org.isoron.uhabits.core.ui.views.PureBlackTheme
 
 class CheckmarkDialog : AppCompatDialogFragment() {
     var onToggle: (Int, String) -> Unit = { _, _ -> }
@@ -51,15 +48,13 @@ class CheckmarkDialog : AppCompatDialogFragment() {
         val prefs = appComponent.preferences
 
         val colorInt = requireArguments().getInt("color")
+        val habitName = requireArguments().getString("name") ?: ""
         val composeColor = Color(colorInt)
         originalNotes = requireArguments().getString("notes") ?: ""
         originalValue = requireArguments().getInt("value")
         currentNotes = originalNotes
 
         val dialog = Dialog(requireContext())
-        dialog.window?.apply {
-            setBackgroundDrawableResource(android.R.color.transparent)
-        }
         val themeSwitcher = AndroidThemeSwitcher(requireContext(), prefs)
 
         val view = ComposeView(requireContext()).apply {
@@ -70,6 +65,7 @@ class CheckmarkDialog : AppCompatDialogFragment() {
 
                     CheckmarkDialogContent(
                         notes = notes,
+                        habitName = habitName,
                         onNotesChanged = {
                             notes = it
                             currentNotes = it
@@ -78,6 +74,9 @@ class CheckmarkDialog : AppCompatDialogFragment() {
                             dismissedViaSaveAction = true
                             onToggle(value, notes)
                             dialog.dismiss()
+                        },
+                        onDismissRequest = {
+                             dialog.dismiss()
                         },
                         primaryColor = composeColor,
                         skipEnabled = prefs.isSkipEnabled,

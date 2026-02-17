@@ -189,6 +189,7 @@ class ShowHabitActivity : AppCompatActivity(), CommandRunner.Listener {
             selectedValue: Int,
             notes: String,
             color: PaletteColor,
+            name: String,
             callback: ListHabitsBehavior.CheckMarkDialogCallback
         ) {
             val theme = view.currentTheme()
@@ -197,6 +198,7 @@ class ShowHabitActivity : AppCompatActivity(), CommandRunner.Listener {
                 putInt("color", theme.color(color).toInt())
                 putInt("value", selectedValue)
                 putString("notes", notes)
+                putString("name", name)
             }
             dialog.onToggle = { v, n -> callback.onNotesSaved(v, n) }
             dialog.dismissCurrentAndShow(supportFragmentManager, "checkmarkDialog")
