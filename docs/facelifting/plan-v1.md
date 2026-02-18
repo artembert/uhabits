@@ -19,7 +19,7 @@ This document outlines the step-by-step iterative migration of Loop Habit Tracke
 
 ### 1.1 Dependency Audit
 - **Task**: Ensure `com.google.android.material:material` is at least version `1.11.0` or higher.
-- **Verification**: Check `gradle/libs.versions.toml`. (Current: `1.12.0` - OK).
+- **Verification**: Check `gradle/libs.versions.toml`. (Current: `1.14.0-alpha09` - OK).
 
 ### 1.2 M3 Color System Definition
 - **Task**: Create `res/values/m3_colors.xml` (and `-night`).
@@ -27,7 +27,7 @@ This document outlines the step-by-step iterative migration of Loop Habit Tracke
 - **Verification**: Colors are accessible in layouts via `?attr/colorPrimary`, etc.
 
 ### 1.3 M3 Theme Setup (Side-by-Side)
-- **Task**: Create a new base theme `Theme.App.M3` inheriting from `Theme.Material3.DayNight.NoActionBar`.
+- **Task**: Create a new base theme `Theme.App.M3` inheriting from `Theme.Material3Expressive.DayNight.NoActionBar`.
 - **Verification**: Temporarily switch one Activity to use this theme and ensure it doesn't crash.
 
 ---
@@ -35,7 +35,7 @@ This document outlines the step-by-step iterative migration of Loop Habit Tracke
 ## Phase 2: Global Theme Transition
 
 ### 2.1 Base Theme Switch
-- **Task**: Update `AppBaseTheme` in `styles.xml` to inherit from `Theme.Material3.DayNight.NoActionBar`.
+- **Task**: Update `AppBaseTheme` in `styles.xml` to inherit from `Theme.Material3Expressive.DayNight.NoActionBar`.
 - **Warning**: This will immediately change the appearance of many components (e.g., larger buttons, different font sizes).
 - **Verification**: Run the app and identify immediate visual regressions (e.g., text contrast issues).
 

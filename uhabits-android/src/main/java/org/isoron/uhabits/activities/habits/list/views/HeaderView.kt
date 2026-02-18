@@ -57,8 +57,6 @@ class HeaderView(
 
     init {
         setScrollerBucketSize(dim(R.dimen.checkmarkWidth).toInt())
-        setBackgroundColor(sres.getColor(R.attr.headerBackgroundColor))
-        elevation = dp(2.0f)
     }
 
     override fun atMidnight() {
@@ -121,7 +119,7 @@ class HeaderView(
             val em = paint.measureText("m")
 
             repeat(buttonCount) { index ->
-                rect.set(0f, 0f, width, height)
+                rect.set(dp(20f), 0f, 0f, height)
                 rect.offset(canvas.width.toFloat() - dp(3.0f), 0f)
 
                 if (isReversed) {

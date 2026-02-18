@@ -33,7 +33,7 @@ object EditHabitSteps {
     fun pickFrequency() {
         Espresso.onView(ViewMatchers.withId(R.id.boolean_frequency_picker))
             .perform(ViewActions.click())
-        Espresso.onView(ViewMatchers.withText("SAVE")).perform(ViewActions.click())
+        Espresso.onView(ViewMatchers.withText(R.string.save)).perform(ViewActions.click())
     }
 
     fun pickMonthFrequency() {
@@ -43,7 +43,7 @@ object EditHabitSteps {
             .perform(ViewActions.click())
         Espresso.onView(ViewMatchers.withId(R.id.xTimesPerMonthTextView))
             .perform(ViewActions.replaceText("1"))
-        Espresso.onView(ViewMatchers.withText("SAVE")).perform(ViewActions.click())
+        Espresso.onView(ViewMatchers.withText(R.string.save)).perform(ViewActions.click())
     }
 
     fun pickDailyFrequency() {
@@ -51,7 +51,7 @@ object EditHabitSteps {
             .perform(ViewActions.click())
         Espresso.onView(ViewMatchers.withId(R.id.everyDayRadioButton))
             .perform(ViewActions.click())
-        Espresso.onView(ViewMatchers.withText("SAVE")).perform(ViewActions.click())
+        Espresso.onView(ViewMatchers.withText(R.string.save)).perform(ViewActions.click())
     }
 
     fun pickColor(color: Int) {

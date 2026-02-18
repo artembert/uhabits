@@ -106,16 +106,26 @@ class ListHabitsScreen
 ) : CommandRunner.Listener,
     ListHabitsBehavior.Screen,
     ListHabitsMenuBehavior.Screen,
-    ListHabitsSelectionMenuBehavior.Screen {
+    ListHabitsSelectionMenuBehavior.Screen,
+    ListHabitsRootView.Listener {
 
     val activity = (context as AppCompatActivity)
 
     fun onAttached() {
         commandRunner.addListener(this)
+        rootView.get().setListener(this)
     }
 
     fun onDetached() {
         commandRunner.removeListener(this)
+    }
+
+    override fun onSettingsClicked() {
+        showSettingsScreen()
+    }
+
+    override fun onAddClicked() {
+        showSelectHabitTypeDialog()
     }
 
     override fun onCommandFinished(command: Command) {
@@ -286,6 +296,7 @@ class ListHabitsScreen
         selectedValue: Int,
         notes: String,
         color: PaletteColor,
+        name: String,
         callback: ListHabitsBehavior.CheckMarkDialogCallback
     ) {
         val theme = rootView.get().currentTheme()
@@ -295,6 +306,7 @@ class ListHabitsScreen
             putInt("color", theme.color(color).toInt())
             putInt("value", selectedValue)
             putString("notes", notes)
+            putString("name", name)
         }
         dialog.onToggle = { v, n -> callback.onNotesSaved(v, n) }
         dialog.dismissCurrentAndShow(fm, "checkmarkDialog")

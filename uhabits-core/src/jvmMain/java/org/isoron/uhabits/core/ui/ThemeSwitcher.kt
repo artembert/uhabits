@@ -43,6 +43,11 @@ abstract class ThemeSwitcher(private val preferences: Preferences) {
                 systemTheme == THEME_DARK && userTheme == THEME_AUTOMATIC
         }
 
+    val isAutoNightMode: Boolean
+        get() {
+            return preferences.theme == THEME_AUTOMATIC
+        }
+
     fun toggleNightMode() {
         val systemTheme = getSystemTheme()
         val userTheme = preferences.theme

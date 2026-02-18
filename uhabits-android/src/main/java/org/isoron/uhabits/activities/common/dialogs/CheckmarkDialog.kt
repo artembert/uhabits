@@ -22,19 +22,17 @@ package org.isoron.uhabits.activities.common.dialogs
 import android.app.Dialog
 import android.content.DialogInterface
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View.GONE
-import android.view.View.VISIBLE
 import androidx.appcompat.app.AppCompatDialogFragment
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import org.isoron.uhabits.HabitsApplication
-import org.isoron.uhabits.R
-import org.isoron.uhabits.core.models.Entry.Companion.NO
-import org.isoron.uhabits.core.models.Entry.Companion.SKIP
-import org.isoron.uhabits.core.models.Entry.Companion.UNKNOWN
-import org.isoron.uhabits.core.models.Entry.Companion.YES_MANUAL
-import org.isoron.uhabits.databinding.CheckmarkPopupBinding
-import org.isoron.uhabits.utils.InterfaceUtils.getFontAwesome
-import org.isoron.uhabits.utils.sres
+import org.isoron.uhabits.activities.AndroidThemeSwitcher
+import org.isoron.uhabits.activities.common.views.AppTheme
 
 class CheckmarkDialog : AppCompatDialogFragment() {
     var onToggle: (Int, String) -> Unit = { _, _ -> }
@@ -43,48 +41,52 @@ class CheckmarkDialog : AppCompatDialogFragment() {
     private var dismissedViaSaveAction = false
     private var originalNotes: String = ""
     private var originalValue: Int = 0
-    private lateinit var view: CheckmarkPopupBinding
+    private var currentNotes: String = ""
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val appComponent = (requireActivity().application as HabitsApplication).component
         val prefs = appComponent.preferences
-        view = CheckmarkPopupBinding.inflate(LayoutInflater.from(context))
-        val color = requireArguments().getInt("color")
-        arrayOf(view.yesBtn, view.skipBtn).forEach {
-            it.setTextColor(color)
-        }
-        arrayOf(view.noBtn, view.unknownBtn).forEach {
-            it.setTextColor(view.root.sres.getColor(R.attr.contrast60))
-        }
-        arrayOf(view.yesBtn, view.noBtn, view.skipBtn, view.unknownBtn).forEach {
-            it.typeface = getFontAwesome(requireContext())
-        }
-        originalNotes = requireArguments().getString("notes")!!
+
+        val colorInt = requireArguments().getInt("color")
+        val habitName = requireArguments().getString("name") ?: ""
+        val composeColor = Color(colorInt)
+        originalNotes = requireArguments().getString("notes") ?: ""
         originalValue = requireArguments().getInt("value")
-        view.notes.setText(originalNotes)
-        if (!prefs.isSkipEnabled) view.skipBtn.visibility = GONE
-        if (!prefs.areQuestionMarksEnabled) view.unknownBtn.visibility = GONE
-        view.booleanButtons.visibility = VISIBLE
+        currentNotes = originalNotes
+
         val dialog = Dialog(requireContext())
-        dialog.setContentView(view.root)
-        dialog.window?.apply {
-            setBackgroundDrawableResource(android.R.color.transparent)
-        }
-        fun onClick(v: Int) {
-            dismissedViaSaveAction = true
-            val notes = view.notes.text.toString().trim()
-            onToggle(v, notes)
-            requireDialog().dismiss()
-        }
-        view.yesBtn.setOnClickListener { onClick(YES_MANUAL) }
-        view.noBtn.setOnClickListener { onClick(NO) }
-        view.skipBtn.setOnClickListener { onClick(SKIP) }
-        view.unknownBtn.setOnClickListener { onClick(UNKNOWN) }
-        view.notes.setOnEditorActionListener { v, actionId, event ->
-            onClick(requireArguments().getInt("value"))
-            true
+        val themeSwitcher = AndroidThemeSwitcher(requireContext(), prefs)
+
+        val view = ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                AppTheme(theme = themeSwitcher.currentTheme) {
+                    var notes by remember { mutableStateOf(originalNotes) }
+
+                    CheckmarkDialogContent(
+                        notes = notes,
+                        habitName = habitName,
+                        onNotesChanged = {
+                            notes = it
+                            currentNotes = it
+                        },
+                        onAction = { value ->
+                            dismissedViaSaveAction = true
+                            onToggle(value, notes)
+                            dialog.dismiss()
+                        },
+                        onDismissRequest = {
+                             dialog.dismiss()
+                        },
+                        primaryColor = composeColor,
+                        skipEnabled = prefs.isSkipEnabled,
+                        unknownEnabled = prefs.areQuestionMarksEnabled
+                    )
+                }
+            }
         }
 
+        dialog.setContentView(view)
         return dialog
     }
 
@@ -92,7 +94,6 @@ class CheckmarkDialog : AppCompatDialogFragment() {
         super.onDismiss(dialog)
 
         if (!dismissedViaSaveAction) {
-            val currentNotes = view.notes.text.toString().trim()
             if (currentNotes != originalNotes) {
                 onToggle(originalValue, currentNotes)
             }

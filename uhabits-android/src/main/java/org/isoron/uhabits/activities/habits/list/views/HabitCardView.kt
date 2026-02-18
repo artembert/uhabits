@@ -133,9 +133,9 @@ class HabitCardView(
 
     init {
         scoreRing = RingView(context).apply {
-            val thickness = dp(3f)
+            val thickness = dp(5f)
             val margin = dp(8f).toInt()
-            val ringSize = dp(15f).toInt()
+            val ringSize = dp(18f).toInt()
             layoutParams = LinearLayout.LayoutParams(ringSize, ringSize).apply {
                 setMargins(margin, 0, margin, 0)
                 gravity = Gravity.CENTER
@@ -147,6 +147,7 @@ class HabitCardView(
             maxLines = 2
             ellipsize = TextUtils.TruncateAt.END
             layoutParams = LinearLayout.LayoutParams(0, WRAP_CONTENT, 1f)
+            setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_BodyLarge)
             if (SDK_INT >= Build.VERSION_CODES.Q) {
                 breakStrategy = BREAK_STRATEGY_BALANCED
             }
@@ -187,7 +188,6 @@ class HabitCardView(
             gravity = Gravity.CENTER_VERTICAL
             orientation = LinearLayout.HORIZONTAL
             layoutParams = LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT)
-            elevation = dp(1f)
 
             addView(scoreRing)
             addView(label)
@@ -202,8 +202,9 @@ class HabitCardView(
 
         clipToPadding = false
         layoutParams = LayoutParams(MATCH_PARENT, WRAP_CONTENT)
-        val margin = dp(3f).toInt()
-        setPadding(margin, 0, margin, margin)
+        val horizontalMargin = dp(16f).toInt()
+        val verticalMargin = dp(4f).toInt()
+        setPadding(horizontalMargin, verticalMargin, horizontalMargin, verticalMargin)
         addView(innerFrame)
     }
 
@@ -309,11 +310,26 @@ class HabitCardView(
     }
 
     private fun updateBackground(isSelected: Boolean) {
-        val background = when (isSelected) {
-            true -> R.drawable.selected_box
-            false -> R.drawable.ripple
+        val rippleColor = sres.getColor(androidx.appcompat.R.attr.colorControlHighlight)
+        val cardColor = if (isSelected) {
+            sres.getColor(com.google.android.material.R.attr.colorSecondaryContainer)
+        } else {
+            sres.getColor(R.attr.cardBgColor)
         }
-        innerFrame.setBackgroundResource(background)
+
+        val shapeDrawable = com.google.android.material.shape.MaterialShapeDrawable(
+            com.google.android.material.shape.ShapeAppearanceModel.builder()
+                .setAllCorners(com.google.android.material.shape.CornerFamily.ROUNDED, dp(16f))
+                .build()
+        ).apply {
+            fillColor = android.content.res.ColorStateList.valueOf(cardColor)
+        }
+
+        innerFrame.background = android.graphics.drawable.RippleDrawable(
+            android.content.res.ColorStateList.valueOf(rippleColor),
+            shapeDrawable,
+            shapeDrawable
+        )
     }
 
     companion object {

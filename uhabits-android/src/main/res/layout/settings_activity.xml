@@ -27,10 +27,11 @@
              tools:context=".activities.settings.SettingsActivity"
              tools:ignore="MergeRootFrame">
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar"
-        app:popupTheme="?toolbarPopupTheme"
-        style="@style/Toolbar"/>
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/toolbar_compose"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true" />
 
     <fragment
         android:id="@+id/fragment"
@@ -38,6 +39,14 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center"
-        android:layout_below="@id/toolbar"/>
+        android:layout_below="@id/toolbar_compose"/>
+
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/compose_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="16dp"/>
 
 </RelativeLayout>

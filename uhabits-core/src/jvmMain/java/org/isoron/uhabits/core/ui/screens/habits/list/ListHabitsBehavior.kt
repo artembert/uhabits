@@ -71,7 +71,8 @@ open class ListHabitsBehavior @Inject constructor(
             screen.showCheckmarkPopup(
                 entry.value,
                 entry.notes,
-                habit.color
+                habit.color,
+                habit.name
             ) { newValue: Int, newNotes: String ->
                 if (newValue != entry.value && newValue == YES_MANUAL) screen.showConfetti(habit.color, x, y)
                 commandRunner.run(CreateRepetitionCommand(habitList, habit, timestamp, newValue, newNotes))
@@ -185,6 +186,7 @@ open class ListHabitsBehavior @Inject constructor(
             selectedValue: Int,
             notes: String,
             color: PaletteColor,
+            name: String,
             callback: CheckMarkDialogCallback
         )
         fun showSendBugReportToDeveloperScreen(log: String)
