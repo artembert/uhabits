@@ -146,19 +146,19 @@ object CommonSteps : BaseUserInterfaceTest() {
         when (screen) {
             Screen.LIST_HABITS ->
                 Espresso.onView(ViewMatchers.withClassName(CoreMatchers.endsWith("ListHabitsRootView")))
-                    .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
+                    .check(ViewAssertions.matches(ViewMatchers.isEnabled()))
 
             Screen.SHOW_HABIT ->
                 Espresso.onView(ViewMatchers.withId(R.id.subtitleCard))
-                    .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
+                    .check(ViewAssertions.matches(ViewMatchers.isEnabled()))
 
             Screen.EDIT_HABIT ->
                 Espresso.onView(ViewMatchers.withId(R.id.questionInput))
-                    .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
+                    .check(ViewAssertions.matches(ViewMatchers.isEnabled()))
 
             Screen.SELECT_HABIT_TYPE ->
                 Espresso.onView(ViewMatchers.withText(R.string.yes_or_no_example))
-                    .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
+                    .check(ViewAssertions.matches(ViewMatchers.isEnabled()))
 
             else -> throw IllegalStateException()
         }

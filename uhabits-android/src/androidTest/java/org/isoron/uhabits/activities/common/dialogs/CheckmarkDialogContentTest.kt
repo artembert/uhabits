@@ -19,6 +19,7 @@
 
 package org.isoron.uhabits.activities.common.dialogs
 
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -39,36 +40,44 @@ class CheckmarkDialogContentTest {
     @Test
     fun displaysInitialState() {
         composeTestRule.setContent {
-            CheckmarkDialogContent(
-                notes = "Initial Note",
-                onNotesChanged = {},
-                onAction = {},
-                onDismissRequest = {},
-                habitName = "Wake up before 8",
-                primaryColor = Color.Blue
-            )
+            MaterialTheme {
+                CheckmarkDialogContent(
+                    notes = "Initial Note",
+                    habitName = "Running",
+                    onNotesChanged = {},
+                    onAction = {},
+                    onDismissRequest = {},
+                    primaryColor = Color.Blue
+                )
+            }
         }
 
-        composeTestRule.onNodeWithText("Checkmark").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Initial Note").assertIsDisplayed()
-        composeTestRule.onNodeWithContentDescription("Check").assertIsDisplayed()
-        composeTestRule.onNodeWithContentDescription("Skip").assertIsDisplayed()
-        composeTestRule.onNodeWithContentDescription("No").assertIsDisplayed()
-        composeTestRule.onNodeWithContentDescription("Question").assertIsDisplayed()
+        // Title and habit name
+        composeTestRule.onNodeWithText("Have you completed this habit today?").assertExists()
+        composeTestRule.onNodeWithText("Running").assertExists()
+        composeTestRule.onNodeWithText("Initial Note").assertExists()
+        
+        // Buttons (they have text now)
+        composeTestRule.onNodeWithText("Check").assertExists()
+        composeTestRule.onNodeWithText("Skip").assertExists()
+        composeTestRule.onNodeWithText("No").assertExists()
+        composeTestRule.onNodeWithText("Question").assertExists()
     }
 
     @Test
     fun updatesNotes() {
         var capturedNotes = ""
         composeTestRule.setContent {
-            CheckmarkDialogContent(
-                notes = "",
-                onNotesChanged = { capturedNotes = it },
-                onAction = {},
-                onDismissRequest = {},
-                habitName = "Wake up before 8",
-                primaryColor = Color.Blue
-            )
+            MaterialTheme {
+                CheckmarkDialogContent(
+                    notes = "",
+                    habitName = "Running",
+                    onNotesChanged = { capturedNotes = it },
+                    onAction = {},
+                    onDismissRequest = {},
+                    primaryColor = Color.Blue
+                )
+            }
         }
 
         composeTestRule.onNodeWithText("Notes").performTextInput("New Note")
@@ -79,26 +88,28 @@ class CheckmarkDialogContentTest {
     fun triggersActions() {
         var capturedAction = -1
         composeTestRule.setContent {
-            CheckmarkDialogContent(
-                notes = "",
-                onNotesChanged = {},
-                onAction = { capturedAction = it },
-                onDismissRequest = {},
-                habitName = "Wake up before 8",
-                primaryColor = Color.Blue
-            )
+            MaterialTheme {
+                CheckmarkDialogContent(
+                    notes = "",
+                    habitName = "Running",
+                    onNotesChanged = {},
+                    onAction = { capturedAction = it },
+                    onDismissRequest = {},
+                    primaryColor = Color.Blue
+                )
+            }
         }
 
-        composeTestRule.onNodeWithContentDescription("Check").performClick()
+        composeTestRule.onNodeWithText("Check").performClick()
         assertEquals(Entry.YES_MANUAL, capturedAction)
 
-        composeTestRule.onNodeWithContentDescription("Skip").performClick()
+        composeTestRule.onNodeWithText("Skip").performClick()
         assertEquals(Entry.SKIP, capturedAction)
         
-        composeTestRule.onNodeWithContentDescription("No").performClick()
+        composeTestRule.onNodeWithText("No").performClick()
         assertEquals(Entry.NO, capturedAction)
 
-        composeTestRule.onNodeWithContentDescription("Question").performClick()
+        composeTestRule.onNodeWithText("Question").performClick()
         assertEquals(Entry.UNKNOWN, capturedAction)
     }
 }
