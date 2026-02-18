@@ -168,9 +168,9 @@ class CheckmarkButtonView(
                 else -> R.string.fa_check
             }
             paint.textSize = when {
-                id == R.string.fa_question -> sp(12.0f)
+                id == R.string.fa_question -> sp(17.0f)
                 value == YES_AUTO -> sp(13.0f)
-                else -> sp(14.0f)
+                else -> sp(17.0f)
             }
             if (value == YES_AUTO) {
                 paint.strokeWidth = 5f

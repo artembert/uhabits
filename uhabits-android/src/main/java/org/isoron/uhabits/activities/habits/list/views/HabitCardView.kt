@@ -133,9 +133,9 @@ class HabitCardView(
 
     init {
         scoreRing = RingView(context).apply {
-            val thickness = dp(3f)
+            val thickness = dp(5f)
             val margin = dp(8f).toInt()
-            val ringSize = dp(15f).toInt()
+            val ringSize = dp(18f).toInt()
             layoutParams = LinearLayout.LayoutParams(ringSize, ringSize).apply {
                 setMargins(margin, 0, margin, 0)
                 gravity = Gravity.CENTER
