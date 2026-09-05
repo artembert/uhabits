@@ -28,6 +28,7 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.PointF
 import android.graphics.drawable.ColorDrawable
+import android.net.Uri
 import android.os.Handler
 import android.os.SystemClock
 import android.view.LayoutInflater
@@ -118,8 +119,13 @@ fun Activity.showMessage(msg: String) {
 }
 
 fun Activity.showSendFileScreen(archiveFilename: String) {
-    val file = File(archiveFilename)
-    val fileUri = FileProvider.getUriForFile(this, "org.isoron.uhabits", file)
+    val uri = Uri.parse(archiveFilename)
+    val fileUri = if (uri.scheme == "content") {
+        uri
+    } else {
+        val file = if (uri.scheme == "file") File(uri.path!!) else File(archiveFilename)
+        FileProvider.getUriForFile(this, "org.isoron.uhabits", file)
+    }
     this.startActivitySafely(
         Intent().apply {
             action = Intent.ACTION_SEND
@@ -215,7 +221,7 @@ fun View.drawNotesIndicator(
     canvas: Canvas,
     color: Int,
     size: Float,
-    notes: String,
+    notes: String
 ) {
     if (notes.isBlank()) return
 
@@ -268,7 +274,8 @@ fun View.applyRootViewInsets() {
 fun View.applyBottomInset() {
     ViewCompat.setOnApplyWindowInsetsListener(this) { view, insets ->
         val systemBarsInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-        view.setPadding(0, 0, 0, systemBarsInsets.bottom)
+        val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime())
+        view.setPadding(0, 0, 0, maxOf(systemBarsInsets.bottom, imeInsets.bottom))
         insets
     }
 }

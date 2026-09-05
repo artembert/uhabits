@@ -1,10 +1,15 @@
 package org.isoron.uhabits.core.utils
 
+import dev.mokkery.mock
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import org.isoron.platform.time.DateUtils
+import org.isoron.platform.time.unixTime
 import org.isoron.uhabits.core.BaseUnitTest
 import org.isoron.uhabits.core.io.StandardLogging
+import org.isoron.uhabits.core.preferences.Preferences
+import org.junit.After
 import org.junit.Test
 import java.util.Calendar
 import java.util.TimeZone
@@ -14,6 +19,12 @@ import kotlin.coroutines.suspendCoroutine
 import kotlin.test.assertEquals
 
 class MidnightTimerTest : BaseUnitTest() {
+
+    @After
+    fun tearDown() {
+        DateUtils.setFixedLocalTime(null)
+        DateUtils.setFixedTimeZone(null)
+    }
 
     @Test
     fun testMidnightTimer_notifyListener_atMidnight() = runBlocking {
@@ -35,7 +46,7 @@ class MidnightTimerTest : BaseUnitTest() {
             )
 
             val suspendedListener = suspendCoroutine<Boolean> { continuation ->
-                MidnightTimer(StandardLogging()).apply {
+                MidnightTimer(StandardLogging(), mock<Preferences>()).apply {
                     addListener { continuation.resume(true) }
                     // When
                     onResume(1, executor)

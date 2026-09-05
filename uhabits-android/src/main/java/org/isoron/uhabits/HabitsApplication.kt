@@ -21,14 +21,13 @@ package org.isoron.uhabits
 
 import android.app.Application
 import android.content.Context
+import org.isoron.platform.time.computeToday
+import org.isoron.platform.time.setToday
 import org.isoron.uhabits.core.database.UnsupportedDatabaseVersionException
 import org.isoron.uhabits.core.reminders.ReminderScheduler
 import org.isoron.uhabits.core.ui.NotificationTray
-import org.isoron.uhabits.core.utils.DateUtils.Companion.setStartDayOffset
-import org.isoron.uhabits.inject.AppContextModule
-import org.isoron.uhabits.inject.DaggerHabitsApplicationComponent
 import org.isoron.uhabits.inject.HabitsApplicationComponent
-import org.isoron.uhabits.inject.HabitsModule
+import org.isoron.uhabits.inject.create
 import org.isoron.uhabits.utils.DatabaseUtils
 import org.isoron.uhabits.widgets.WidgetUpdater
 import java.io.File
@@ -61,20 +60,15 @@ class HabitsApplication : Application() {
         }
 
         val db = DatabaseUtils.getDatabaseFile(this)
-        HabitsApplication.component = DaggerHabitsApplicationComponent
-            .builder()
-            .appContextModule(AppContextModule(context))
-            .habitsModule(HabitsModule(db))
-            .build()
+        HabitsApplication.component = HabitsApplicationComponent::class.create(
+            appContext = context,
+            dbFile = db
+        )
 
         val prefs = component.preferences
         prefs.lastAppVersion = BuildConfig.VERSION_CODE
 
-        if (prefs.isMidnightDelayEnabled) {
-            setStartDayOffset(3, 0)
-        } else {
-            setStartDayOffset(0, 0)
-        }
+        setToday(computeToday(component.preferences.midnightDelayHours, 0))
 
         val habitList = component.habitList
         for (h in habitList) h.recompute()

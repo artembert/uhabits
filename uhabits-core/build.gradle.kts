@@ -20,6 +20,7 @@
 plugins {
     kotlin("multiplatform")
     alias(libs.plugins.ktlint.plugin)
+    alias(libs.plugins.mokkery)
 }
 
 // For local run
@@ -33,11 +34,22 @@ kotlin {
     jvm().withJava()
     jvmToolchain(17)
 
+    js(IR) {
+        browser {
+            testTask {
+                useKarma {
+                    useChromeHeadless()
+                }
+            }
+        }
+    }
+
     sourceSets {
         val commonMain by getting {
             dependencies {
                 implementation(kotlin("stdlib-common"))
-                implementation(libs.kotlinx.coroutines.core.common)
+                implementation(libs.kotlinx.coroutines.core)
+                compileOnly(libs.kotlin.inject.runtime)
             }
         }
 
@@ -45,20 +57,19 @@ kotlin {
             dependencies {
                 implementation(kotlin("test-common"))
                 implementation(kotlin("test-annotations-common"))
+                implementation(libs.kotlinx.coroutines.test)
             }
         }
 
         val jvmMain by getting {
             dependencies {
                 implementation(kotlin("stdlib-jdk8"))
-                compileOnly(libs.dagger)
                 implementation(libs.guava)
                 implementation(libs.kotlinx.coroutines.core.jvm)
                 implementation(libs.annotation)
                 implementation(libs.jsr305)
                 implementation(libs.opencsv)
                 implementation(libs.commons.codec)
-                implementation(libs.commons.lang3)
             }
         }
 
@@ -69,10 +80,34 @@ kotlin {
                 implementation(libs.sqlite.jdbc)
                 implementation(libs.hamcrest)
                 implementation(libs.commons.io)
-                implementation(libs.mockito.kotlin)
                 implementation(libs.junit.jupiter)
             }
         }
+
+        val jsMain by getting {
+            dependencies {
+                implementation(npm("sql.js", "1.11.0"))
+                implementation(npm("sprintf-js", "1.1.3"))
+                implementation(npm("jszip", "3.10.1"))
+            }
+        }
+
+        val jsTest by getting {
+            dependencies {
+                implementation(kotlin("test-js"))
+            }
+        }
+    }
+}
+
+mokkery {
+    defaultMockMode.set(dev.mokkery.MockMode.autofill)
+    stubs.allowConcreteClassInstantiation.set(true)
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile> {
+    compilerOptions {
+        freeCompilerArgs.add("-jvm-default=enable")
     }
 }
 

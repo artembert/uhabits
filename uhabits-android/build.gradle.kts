@@ -22,6 +22,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.ktlint.plugin)
+    alias(libs.plugins.mokkery)
 }
 
 tasks.compileLint {
@@ -42,6 +43,12 @@ kotlin {
 android {
     namespace = "org.isoron.uhabits"
     compileSdk = 36
+
+    sourceSets {
+        getByName("main") {
+            assets.srcDirs("src/main/assets", "../uhabits-core/assets/main")
+        }
+    }
 
     defaultConfig {
         versionCode = 20301
@@ -83,17 +90,26 @@ android {
         sourceCompatibility(JavaVersion.VERSION_17)
     }
 
-    kotlinOptions.jvmTarget = JavaVersion.VERSION_17.toString()
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+        }
+    }
     buildFeatures.viewBinding = true
     lint.abortOnError = false
 }
 
+mokkery {
+    defaultMockMode.set(dev.mokkery.MockMode.autofill)
+    stubs.allowClassInheritance.set(true)
+    stubs.allowConcreteClassInstantiation.set(true)
+}
+
 dependencies {
-    compileOnly(libs.jsr250.api)
     coreLibraryDesugaring(libs.desugar.jdk.libs)
     implementation(libs.appIntro)
     implementation(libs.jsr305)
-    implementation(libs.dagger)
+    implementation(libs.kotlin.inject.runtime)
     implementation(libs.guava)
     implementation(libs.ktor.client.android)
     implementation(libs.ktor.client.core)
@@ -110,8 +126,18 @@ dependencies {
     implementation(libs.opencsv)
     implementation(libs.konfetti.xml)
     implementation(project(":uhabits-core"))
-    ksp(libs.dagger.compiler)
+    ksp(libs.kotlin.inject.compiler)
 
-    androidTestImplementation(libs.bundles.androidTest)
-    testImplementation(libs.bundles.test)
+    androidTestImplementation(libs.annotation)
+    androidTestImplementation(libs.kotlin.inject.runtime)
+    androidTestImplementation(libs.espresso.contrib)
+    androidTestImplementation(libs.espresso.core)
+    androidTestImplementation(libs.junit)
+    androidTestImplementation(libs.ktor.client.mock)
+    androidTestImplementation(libs.ktor.jackson)
+    androidTestImplementation(libs.rules)
+    androidTestImplementation(libs.uiautomator)
+
+    testImplementation(libs.kotlin.inject.runtime)
+    testImplementation(libs.junit.junit)
 }

@@ -18,6 +18,8 @@
  */
 package org.isoron.uhabits.core.reminders
 
+import me.tatarka.inject.annotations.Inject
+import org.isoron.platform.time.DateUtils
 import org.isoron.uhabits.core.AppScope
 import org.isoron.uhabits.core.commands.ChangeHabitColorCommand
 import org.isoron.uhabits.core.commands.Command
@@ -27,16 +29,10 @@ import org.isoron.uhabits.core.models.Habit
 import org.isoron.uhabits.core.models.HabitList
 import org.isoron.uhabits.core.models.HabitMatcher
 import org.isoron.uhabits.core.preferences.WidgetPreferences
-import org.isoron.uhabits.core.utils.DateUtils.Companion.applyTimezone
-import org.isoron.uhabits.core.utils.DateUtils.Companion.getLocalTime
-import org.isoron.uhabits.core.utils.DateUtils.Companion.getStartOfDayWithOffset
-import org.isoron.uhabits.core.utils.DateUtils.Companion.removeTimezone
-import java.util.Locale
-import java.util.Objects
-import javax.inject.Inject
 
 @AppScope
-class ReminderScheduler @Inject constructor(
+@Inject
+open class ReminderScheduler(
     private val commandRunner: CommandRunner,
     private val habitList: HabitList,
     private val sys: SystemScheduler,
@@ -50,7 +46,7 @@ class ReminderScheduler @Inject constructor(
     }
 
     @Synchronized
-    fun schedule(habit: Habit) {
+    open fun schedule(habit: Habit) {
         if (habit.id == null) {
             sys.log("ReminderScheduler", "Habit has null id. Returning.")
             return
@@ -59,19 +55,14 @@ class ReminderScheduler @Inject constructor(
             sys.log("ReminderScheduler", "habit=" + habit.id + " has no reminder. Skipping.")
             return
         }
-        var reminderTime = Objects.requireNonNull(habit.reminder)!!.timeInMillis
+        var reminderTime = DateUtils.getUpcomingTimeInMillis(
+            habit.reminder!!.hour,
+            habit.reminder!!.minute
+        )
         val snoozeReminderTime = widgetPreferences.getSnoozeTime(habit.id!!)
         if (snoozeReminderTime != 0L) {
-            val now = applyTimezone(getLocalTime())
-            sys.log(
-                "ReminderScheduler",
-                String.format(
-                    Locale.US,
-                    "Habit %d has been snoozed until %d",
-                    habit.id,
-                    snoozeReminderTime
-                )
-            )
+            val now = DateUtils.applyTimezone(DateUtils.getLocalTime())
+            sys.log("ReminderScheduler", "Habit ${habit.id} has been snoozed until $snoozeReminderTime")
             if (snoozeReminderTime > now) {
                 sys.log("ReminderScheduler", "Snooze time is in the future. Accepting.")
                 reminderTime = snoozeReminderTime
@@ -84,7 +75,7 @@ class ReminderScheduler @Inject constructor(
     }
 
     @Synchronized
-    fun scheduleAtTime(habit: Habit, reminderTime: Long) {
+    open fun scheduleAtTime(habit: Habit, reminderTime: Long) {
         sys.log("ReminderScheduler", "Scheduling alarm for habit=" + habit.id)
         if (!habit.hasReminder()) {
             sys.log("ReminderScheduler", "habit=" + habit.id + " has no reminder. Skipping.")
@@ -94,45 +85,36 @@ class ReminderScheduler @Inject constructor(
             sys.log("ReminderScheduler", "habit=" + habit.id + " is archived. Skipping.")
             return
         }
-        val timestamp = getStartOfDayWithOffset(removeTimezone(reminderTime))
-        sys.log(
-            "ReminderScheduler",
-            String.format(
-                Locale.US,
-                "reminderTime=%d removeTimezone=%d timestamp=%d",
-                reminderTime,
-                removeTimezone(reminderTime),
-                timestamp
-            )
-        )
+        val timestamp = DateUtils.getStartOfDayWithOffset(DateUtils.removeTimezone(reminderTime), 0, 0)
+        sys.log("ReminderScheduler", "reminderTime=$reminderTime removeTimezone=${DateUtils.removeTimezone(reminderTime)} timestamp=$timestamp")
         sys.scheduleShowReminder(reminderTime, habit, timestamp)
     }
 
     @Synchronized
-    fun scheduleAll() {
+    open fun scheduleAll() {
         sys.log("ReminderScheduler", "Scheduling all alarms")
         val reminderHabits = habitList.getFiltered(HabitMatcher.WITH_ALARM)
         for (habit in reminderHabits) schedule(habit)
     }
 
     @Synchronized
-    fun hasHabitsWithReminders(): Boolean {
+    open fun hasHabitsWithReminders(): Boolean {
         return !habitList.getFiltered(HabitMatcher.WITH_ALARM).isEmpty
     }
 
     @Synchronized
-    fun startListening() {
+    open fun startListening() {
         commandRunner.addListener(this)
     }
 
     @Synchronized
-    fun stopListening() {
+    open fun stopListening() {
         commandRunner.removeListener(this)
     }
 
     @Synchronized
-    fun snoozeReminder(habit: Habit, minutes: Long) {
-        val now = applyTimezone(getLocalTime())
+    open fun snoozeReminder(habit: Habit, minutes: Long) {
+        val now = DateUtils.applyTimezone(DateUtils.getLocalTime())
         val snoozedUntil = now + minutes * 60 * 1000
         widgetPreferences.setSnoozeTime(habit.id!!, snoozedUntil)
         schedule(habit)

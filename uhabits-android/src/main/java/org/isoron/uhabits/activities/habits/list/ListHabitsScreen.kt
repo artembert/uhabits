@@ -25,11 +25,12 @@ import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings
 import androidx.appcompat.app.AppCompatActivity
-import dagger.Lazy
+import me.tatarka.inject.annotations.Inject
 import nl.dionsegijn.konfetti.core.Party
 import nl.dionsegijn.konfetti.core.Position
 import nl.dionsegijn.konfetti.core.emitter.Emitter
 import org.isoron.platform.gui.toInt
+import org.isoron.platform.io.JavaUserFile
 import org.isoron.uhabits.R
 import org.isoron.uhabits.activities.common.dialogs.CheckmarkDialog
 import org.isoron.uhabits.activities.common.dialogs.ColorPickerDialogFactory
@@ -50,6 +51,8 @@ import org.isoron.uhabits.core.models.PaletteColor
 import org.isoron.uhabits.core.preferences.Preferences
 import org.isoron.uhabits.core.tasks.TaskRunner
 import org.isoron.uhabits.core.ui.ThemeSwitcher
+import org.isoron.uhabits.core.ui.callbacks.CheckMarkDialogCallback
+import org.isoron.uhabits.core.ui.callbacks.NumberPickerCallback
 import org.isoron.uhabits.core.ui.callbacks.OnColorPickedCallback
 import org.isoron.uhabits.core.ui.callbacks.OnConfirmedCallback
 import org.isoron.uhabits.core.ui.screens.habits.list.ListHabitsBehavior
@@ -78,7 +81,6 @@ import org.isoron.uhabits.utils.showSendFileScreen
 import java.io.File
 import java.io.IOException
 import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 
 const val RESULT_IMPORT_DATA = 101
 const val RESULT_EXPORT_CSV = 102
@@ -88,9 +90,9 @@ const val RESULT_REPAIR_DB = 105
 const val REQUEST_OPEN_DOCUMENT = 106
 const val REQUEST_SETTINGS = 107
 
+@Inject
 @ActivityScope
-class ListHabitsScreen
-@Inject constructor(
+class ListHabitsScreen(
     @ActivityContext val context: Context,
     private val commandRunner: CommandRunner,
     private val intentFactory: IntentFactory,
@@ -138,7 +140,7 @@ class ListHabitsScreen
             val cacheDir = activity.externalCacheDir
             val tempFile = File.createTempFile("import", "", cacheDir)
             inStream.copyTo(tempFile)
-            onImportData(tempFile) { tempFile.delete() }
+            onImportData(JavaUserFile(tempFile.toPath())) { tempFile.delete() }
         } catch (e: IOException) {
             activity.showMessage(activity.resources.getString(R.string.could_not_import))
             e.printStackTrace()
@@ -148,10 +150,10 @@ class ListHabitsScreen
     private fun onSettingsResult(resultCode: Int) {
         when (resultCode) {
             RESULT_IMPORT_DATA -> showImportScreen()
-            RESULT_EXPORT_CSV -> behavior.get().onExportCSV()
+            RESULT_EXPORT_CSV -> behavior.value.onExportCSV()
             RESULT_EXPORT_DB -> onExportDB()
-            RESULT_BUG_REPORT -> behavior.get().onSendBugReport()
-            RESULT_REPAIR_DB -> behavior.get().onRepairDB()
+            RESULT_BUG_REPORT -> behavior.value.onSendBugReport()
+            RESULT_REPAIR_DB -> behavior.value.onRepairDB()
         }
     }
 
@@ -236,7 +238,7 @@ class ListHabitsScreen
             return
         }
         val baseColor = themeSwitcher.currentTheme!!.color(color).toInt()
-        rootView.get().konfettiView.start(
+        rootView.value.konfettiView.start(
             Party(
                 speed = 0f,
                 maxSpeed = 16f,
@@ -270,7 +272,7 @@ class ListHabitsScreen
     override fun showNumberPopup(
         value: Double,
         notes: String,
-        callback: ListHabitsBehavior.NumberPickerCallback
+        callback: NumberPickerCallback
     ) {
         val fm = (context as AppCompatActivity).supportFragmentManager
         val dialog = NumberDialog()
@@ -286,9 +288,9 @@ class ListHabitsScreen
         selectedValue: Int,
         notes: String,
         color: PaletteColor,
-        callback: ListHabitsBehavior.CheckMarkDialogCallback
+        callback: CheckMarkDialogCallback
     ) {
-        val theme = rootView.get().currentTheme()
+        val theme = rootView.value.currentTheme()
         val fm = (context as AppCompatActivity).supportFragmentManager
         val dialog = CheckmarkDialog()
         dialog.arguments = Bundle().apply {
@@ -342,7 +344,7 @@ class ListHabitsScreen
         }
     }
 
-    private fun onImportData(file: File, onFinished: () -> Unit) {
+    private fun onImportData(file: org.isoron.platform.io.UserFile, onFinished: () -> Unit) {
         taskRunner.execute(
             importTaskFactory.create(file) { result ->
                 when (result) {

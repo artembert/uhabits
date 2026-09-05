@@ -53,6 +53,11 @@ interface FileOpener {
  */
 interface UserFile {
     /**
+     * The resolved absolute path string.
+     */
+    val pathString: String
+
+    /**
      * Deletes the user file. If the file does not exist, nothing happens.
      */
     suspend fun delete()
@@ -67,6 +72,38 @@ interface UserFile {
      * exception.
      */
     suspend fun lines(): List<String>
+
+    /**
+     * Overwrites the file with [content], creating it if it doesn't exist.
+     */
+    suspend fun writeString(content: String)
+
+    /**
+     * Overwrites the file with [bytes], creating it if it doesn't exist.
+     */
+    suspend fun writeBytes(bytes: ByteArray)
+
+    /**
+     * Reads the first [limit] bytes from the file.
+     */
+    suspend fun readBytes(limit: Int): ByteArray
+
+    /**
+     * Returns a [UserFile] whose path is [child] resolved against this file's
+     * parent directory (or this file itself, if it represents a directory).
+     */
+    fun resolve(child: String): UserFile
+
+    /**
+     * Returns the list of files and directories within this directory, or null
+     * if this path is not a directory or does not exist.
+     */
+    suspend fun listFiles(): List<UserFile>?
+
+    /**
+     * Creates this directory and any necessary parent directories.
+     */
+    suspend fun mkdirs()
 }
 
 /**

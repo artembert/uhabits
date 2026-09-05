@@ -18,44 +18,41 @@
  */
 package org.isoron.uhabits
 
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import org.isoron.platform.time.LocalDate
+import org.isoron.platform.time.setToday
 import org.isoron.uhabits.core.commands.CommandRunner
 import org.isoron.uhabits.core.models.HabitList
 import org.isoron.uhabits.core.models.memory.MemoryModelFactory
-import org.isoron.uhabits.core.tasks.SingleThreadTaskRunner
+import org.isoron.uhabits.core.tasks.CoroutineTaskRunner
+import org.isoron.uhabits.core.tasks.TaskRunner
 import org.isoron.uhabits.core.test.HabitFixtures
-import org.isoron.uhabits.core.utils.DateUtils.Companion.setFixedLocalTime
-import org.isoron.uhabits.core.utils.DateUtils.Companion.setStartDayOffset
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.mockito.junit.MockitoJUnitRunner
-import org.mockito.kotlin.spy
 
-@RunWith(MockitoJUnitRunner::class)
 open class BaseAndroidJVMTest {
     private lateinit var habitList: HabitList
     protected lateinit var fixtures: HabitFixtures
     private lateinit var modelFactory: MemoryModelFactory
-    private lateinit var taskRunner: SingleThreadTaskRunner
+    private lateinit var taskRunner: TaskRunner
     private lateinit var commandRunner: CommandRunner
 
     @Before
     open fun setUp() {
-        val fixedLocalTime = 1422172800000L
-        setFixedLocalTime(fixedLocalTime)
-        setStartDayOffset(0, 0)
+        setToday(LocalDate(2015, 1, 25))
         modelFactory = MemoryModelFactory()
-        habitList = spy(modelFactory.buildHabitList())
+        habitList = modelFactory.buildHabitList()
         fixtures = HabitFixtures(modelFactory, habitList)
-        taskRunner = SingleThreadTaskRunner()
+        taskRunner = CoroutineTaskRunner(
+            mainDispatcher = UnconfinedTestDispatcher(),
+            ioDispatcher = UnconfinedTestDispatcher()
+        )
         commandRunner = CommandRunner(taskRunner)
     }
 
     @After
     fun tearDown() {
-        setFixedLocalTime(null)
-        setStartDayOffset(0, 0)
     }
 
     @Test

@@ -18,29 +18,26 @@
  */
 package org.isoron.uhabits.core.reminders
 
+import dev.mokkery.answering.returns
+import dev.mokkery.every
+import dev.mokkery.matcher.any
+import dev.mokkery.mock
+import dev.mokkery.verify
+import org.isoron.platform.time.DateUtils
+import org.isoron.platform.time.DateUtils.removeTimezone
+import org.isoron.platform.time.DateUtils.setFixedLocalTime
+import org.isoron.platform.time.DateUtils.setFixedTimeZone
+import org.isoron.platform.time.unixTime
 import org.isoron.uhabits.core.BaseUnitTest
 import org.isoron.uhabits.core.models.Habit
 import org.isoron.uhabits.core.models.Reminder
 import org.isoron.uhabits.core.models.WeekdayList
 import org.isoron.uhabits.core.preferences.WidgetPreferences
-import org.isoron.uhabits.core.utils.DateUtils.Companion.applyTimezone
-import org.isoron.uhabits.core.utils.DateUtils.Companion.getStartOfTodayCalendar
-import org.isoron.uhabits.core.utils.DateUtils.Companion.removeTimezone
-import org.isoron.uhabits.core.utils.DateUtils.Companion.setFixedLocalTime
-import org.isoron.uhabits.core.utils.DateUtils.Companion.setFixedTimeZone
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.mockito.ArgumentMatchers.anyLong
-import org.mockito.junit.MockitoJUnitRunner
-import org.mockito.kotlin.eq
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
-import java.util.Calendar
 import java.util.TimeZone
 
-@RunWith(MockitoJUnitRunner::class)
 class ReminderSchedulerTest : BaseUnitTest() {
     private val habitId = 10L
     private lateinit var habit: Habit
@@ -60,6 +57,12 @@ class ReminderSchedulerTest : BaseUnitTest() {
         setFixedTimeZone(TimeZone.getTimeZone("GMT-4"))
     }
 
+    @After
+    fun tearDown() {
+        setFixedLocalTime(null)
+        setFixedTimeZone(null)
+    }
+
     @Test
     fun testScheduleAll() {
         val now = unixTime(2015, 1, 26, 13, 0)
@@ -74,16 +77,20 @@ class ReminderSchedulerTest : BaseUnitTest() {
         habitList.add(h2)
         habitList.add(h3)
         reminderScheduler.scheduleAll()
-        verify(sys).scheduleShowReminder(
-            eq(unixTime(2015, 1, 27, 12, 30)),
-            eq(h1),
-            anyLong()
-        )
-        verify(sys).scheduleShowReminder(
-            eq(unixTime(2015, 1, 26, 22, 30)),
-            eq(h2),
-            anyLong()
-        )
+        verify {
+            sys.scheduleShowReminder(
+                unixTime(2015, 1, 27, 12, 30),
+                h1,
+                any()
+            )
+        }
+        verify {
+            sys.scheduleShowReminder(
+                unixTime(2015, 1, 26, 22, 30),
+                h2,
+                any()
+            )
+        }
     }
 
     @Test
@@ -100,17 +107,18 @@ class ReminderSchedulerTest : BaseUnitTest() {
         setFixedLocalTime(now)
         val snoozeTimeInFuture = unixTime(2015, 1, 1, 21, 0)
         val snoozeTimeInPast = unixTime(2015, 1, 1, 7, 0)
-        val regularReminderTime = applyTimezone(unixTime(2015, 1, 2, 8, 30))
+        val regularReminderTime = DateUtils.applyTimezone(unixTime(2015, 1, 2, 8, 30))
         val todayCheckmarkTime = unixTime(2015, 1, 1, 0, 0)
         val tomorrowCheckmarkTime = unixTime(2015, 1, 2, 0, 0)
         habit.reminder = Reminder(8, 30, WeekdayList.EVERY_DAY)
-        whenever(widgetPreferences.getSnoozeTime(habitId)).thenReturn(snoozeTimeInFuture)
+        every { widgetPreferences.getSnoozeTime(habitId) } returns snoozeTimeInFuture
         reminderScheduler.schedule(habit)
-        verify(sys).scheduleShowReminder(snoozeTimeInFuture, habit, todayCheckmarkTime)
-        whenever(widgetPreferences.getSnoozeTime(habitId)).thenReturn(snoozeTimeInPast)
+        verify { sys.scheduleShowReminder(snoozeTimeInFuture, habit, todayCheckmarkTime) }
+        every { widgetPreferences.getSnoozeTime(habitId) } returns snoozeTimeInPast
         reminderScheduler.schedule(habit)
-        verify(sys)
-            .scheduleShowReminder(regularReminderTime, habit, tomorrowCheckmarkTime)
+        verify {
+            sys.scheduleShowReminder(regularReminderTime, habit, tomorrowCheckmarkTime)
+        }
     }
 
     @Test
@@ -138,12 +146,6 @@ class ReminderSchedulerTest : BaseUnitTest() {
         reminderScheduler.schedule(habit)
     }
 
-    override fun unixTime(year: Int, month: Int, day: Int, hour: Int, minute: Int, milliseconds: Long): Long {
-        val cal: Calendar = getStartOfTodayCalendar()
-        cal[year, month, day, hour] = minute
-        return cal.timeInMillis
-    }
-
     private fun scheduleAndVerify(
         atTime: Long?,
         expectedCheckmarkTime: Long,
@@ -157,10 +159,12 @@ class ReminderSchedulerTest : BaseUnitTest() {
                 atTime
             )
         }
-        verify(sys).scheduleShowReminder(
-            expectedReminderTime,
-            habit,
-            expectedCheckmarkTime
-        )
+        verify {
+            sys.scheduleShowReminder(
+                expectedReminderTime,
+                habit,
+                expectedCheckmarkTime
+            )
+        }
     }
 }

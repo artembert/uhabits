@@ -22,11 +22,21 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import dagger.Component
+import me.tatarka.inject.annotations.Component
+import org.isoron.platform.time.computeToday
+import org.isoron.platform.time.setToday
 import org.isoron.uhabits.HabitsApplication
 import org.isoron.uhabits.core.ui.widgets.WidgetBehavior
 import org.isoron.uhabits.inject.HabitsApplicationComponent
 import org.isoron.uhabits.intents.IntentParser.CheckmarkIntentData
+
+@ReceiverScope
+@Component
+internal abstract class WidgetComponent(
+    @Component val parent: HabitsApplicationComponent
+) {
+    abstract val widgetController: WidgetBehavior
+}
 
 /**
  * The Android BroadcastReceiver for Loop Habit Tracker.
@@ -37,10 +47,7 @@ import org.isoron.uhabits.intents.IntentParser.CheckmarkIntentData
 class WidgetReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val app = context.applicationContext as HabitsApplication
-        val component = DaggerWidgetReceiver_WidgetComponent
-            .builder()
-            .habitsApplicationComponent(app.component)
-            .build()
+        val component = WidgetComponent::class.create(app.component)
         val parser = app.component.intentParser
         val controller = component.widgetController
         val prefs = app.component.preferences
@@ -57,45 +64,46 @@ class WidgetReceiver : BroadcastReceiver() {
                     Log.d(
                         TAG,
                         String.format(
-                            "onAddRepetition habit=%d timestamp=%d",
+                            "onAddRepetition habit=%d date=%s",
                             data!!.habit.id,
-                            data.timestamp.unixTime
+                            data.date
                         )
                     )
                     controller.onAddRepetition(
                         data.habit,
-                        data.timestamp
+                        data.date
                     )
                 }
                 ACTION_TOGGLE_REPETITION -> {
                     Log.d(
                         TAG,
                         String.format(
-                            "onToggleRepetition habit=%d timestamp=%d",
+                            "onToggleRepetition habit=%d date=%s",
                             data!!.habit.id,
-                            data.timestamp.unixTime
+                            data.date
                         )
                     )
                     controller.onToggleRepetition(
                         data.habit,
-                        data.timestamp
+                        data.date
                     )
                 }
                 ACTION_REMOVE_REPETITION -> {
                     Log.d(
                         TAG,
                         String.format(
-                            "onRemoveRepetition habit=%d timestamp=%d",
+                            "onRemoveRepetition habit=%d date=%s",
                             data!!.habit.id,
-                            data.timestamp.unixTime
+                            data.date
                         )
                     )
                     controller.onRemoveRepetition(
                         data.habit,
-                        data.timestamp
+                        data.date
                     )
                 }
                 ACTION_UPDATE_WIDGETS_VALUE -> {
+                    setToday(computeToday(prefs.midnightDelayHours, 0))
                     widgetUpdater.updateWidgets()
                     widgetUpdater.scheduleStartDayWidgetUpdate()
                 }
@@ -103,12 +111,6 @@ class WidgetReceiver : BroadcastReceiver() {
         } catch (e: RuntimeException) {
             Log.e("WidgetReceiver", "could not process intent", e)
         }
-    }
-
-    @ReceiverScope
-    @Component(dependencies = [HabitsApplicationComponent::class])
-    internal interface WidgetComponent {
-        val widgetController: WidgetBehavior
     }
 
     companion object {

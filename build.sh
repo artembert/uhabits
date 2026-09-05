@@ -22,26 +22,17 @@ ANDROID_OUTPUTS_DIR="uhabits-android/build/outputs"
 AVDMANAGER="${ANDROID_HOME}/cmdline-tools/latest/bin/avdmanager"
 AVD_PREFIX="uhabitsTest"
 EMULATOR="${ANDROID_HOME}/emulator/emulator"
-GRADLE="./gradlew --stacktrace --quiet"
+GRADLE="./gradlew --stacktrace --quiet --console=plain"
+GRADLE_LOG="build/gradle-output.log"
 PACKAGE_NAME=org.isoron.uhabits
 SDKMANAGER="${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager"
 VERSION=$(grep versionName uhabits-android/build.gradle.kts | sed -e 's/.*"\([^"]*\)".*/\1/g')
+ATTEMPTS=1
 BOOT_TIMEOUT=360
-
-if [ -z $VERSION ]; then
-    echo "Could not parse app version from: uhabits-android/build.gradle.kts"
-    exit 1
-fi
-
-if [ ! -f "${ANDROID_HOME}/platform-tools/adb" ]; then
-    echo "Error: ANDROID_HOME is not set correctly; ${ANDROID_HOME}/platform-tools/adb not found"
-    exit 1
-fi
-
-if [ ! -f "$EMULATOR" ]; then
-  echo "Error: Not found: $EMULATOR"
-  exit 1
-fi
+case "$(uname -m)" in
+    arm64|aarch64) ARCH="arm64-v8a" ;;
+    *)             ARCH="x86_64" ;;
+esac
 
 # Logging
 # -----------------------------------------------------------------------------
@@ -58,112 +49,186 @@ log_info() {
     echo -e "$COLOR* $1 $NC"
 }
 
+log_debug() {
+    local COLOR='\033[0;90m'
+    local NC='\033[0m'
+    echo -e "${COLOR}$1 $NC"
+}
+
+run() {
+    log_debug "$*"
+    "$@"
+}
+
 fail() {
     log_error "BUILD FAILED"
     exit 1
+}
+
+# Validation
+# -----------------------------------------------------------------------------
+
+if [ -z $VERSION ]; then
+    log_error "Could not parse app version from: uhabits-android/build.gradle.kts"
+    exit 1
+fi
+
+if [ ! -f "${ANDROID_HOME}/platform-tools/adb" ]; then
+    log_error "ANDROID_HOME is not set correctly; ${ANDROID_HOME}/platform-tools/adb not found"
+    exit 1
+fi
+
+if [ ! -f "$EMULATOR" ]; then
+    log_error "Not found: $EMULATOR"
+    exit 1
+fi
+
+MISSING_DEPS=0
+IS_MACOS=0
+if [[ "$(uname)" == "Darwin" ]]; then
+    IS_MACOS=1
+fi
+
+check_cmd() {
+    local cmd=$1
+    local brew_pkg=$2
+    if ! command -v "$cmd" &>/dev/null; then
+        if [ $IS_MACOS -eq 1 ] && [ -n "$brew_pkg" ]; then
+            log_error "Required command not found: $cmd (try: brew install $brew_pkg)"
+        else
+            log_error "Required command not found: $cmd"
+        fi
+        MISSING_DEPS=1
+    fi
+}
+
+check_cmd flock flock
+check_cmd timeout coreutils
+check_cmd ts moreutils
+check_cmd rsync rsync
+check_cmd pgrep ""
+check_cmd pkill ""
+
+if [ $MISSING_DEPS -ne 0 ]; then
+    exit 1
+fi
+
+
+gradle_run() {
+    log_debug "./gradlew $*"
+    mkdir -p build
+    if ! $GRADLE "$@" > "$GRADLE_LOG" 2>&1; then
+        log_error "Gradle command failed: $*"
+        grep -E "^e:|^w:|^FAILURE|^> " "$GRADLE_LOG" | head -40
+        log_error "Full log: $GRADLE_LOG"
+        return 1
+    fi
 }
 
 # Core
 # -----------------------------------------------------------------------------
 
 core_build() {
+    log_info "Formatting code..."
+    gradle_run ktlintFormat || fail
     log_info "Building uhabits-core..."
-    $GRADLE ktlintCheck || fail
-    $GRADLE lintDebug || fail
-    $GRADLE :uhabits-core:build || fail
+    gradle_run kotlinUpgradeYarnLock || fail
+    gradle_run :uhabits-core:build || fail
 }
 
 # Android
 # -----------------------------------------------------------------------------
 
+android_accept_licenses() {
+    log_info "Accepting Android SDK licenses..."
+    yes | run $SDKMANAGER --licenses
+}
+
 android_setup() {
-    API=$1
-    AVDNAME=${AVD_PREFIX}${API}
+    local API=$1
+    local AVDNAME=${AVD_PREFIX}${API}
 
     (
         flock 10
+
         log_info "Stopping Android emulator..."
         while [[ -n $(pgrep -f ${AVDNAME}) ]]; do
             pkill -9 -f ${AVDNAME}
         done
 
         log_info "Removing existing Android virtual device..."
-        $AVDMANAGER delete avd --name $AVDNAME
+        run $AVDMANAGER delete avd --name $AVDNAME
 
         log_info "Creating new Android virtual device (API $API)..."
-        (echo "y" | $SDKMANAGER --install "system-images;android-$API;google_apis;x86_64") || return 1
-        $AVDMANAGER create avd \
+        run $SDKMANAGER --install "system-images;android-$API;google_apis;$ARCH" || return 1
+        run $AVDMANAGER create avd \
                 --name $AVDNAME \
-                --package "system-images;android-$API;google_apis;x86_64" \
+                --package "system-images;android-$API;google_apis;$ARCH" \
                 --device "Nexus 4" || return 1
 
         flock -u 10
     ) 10>/tmp/uhabitsTest.lock
-
-    log_info "Launching emulator..."
-    $EMULATOR \
-        -avd $AVDNAME \
-        -port 6${API}0 \
-        1>/dev/null 2>&1 &
-
-    log_info "Waiting for emulator to boot..."
-    export ADB="$ADB -s emulator-6${API}0"
-    timeout $BOOT_TIMEOUT $ADB wait-for-device shell 'while [[ -z "$(getprop sys.boot_completed)" ]]; do echo Waiting...; sleep 1; done; input keyevent 82'
-    if [ $? -ne 0 ]; then
-        log_error "Emulator failed to boot after $BOOT_TIMEOUT seconds."
-        return 1
-    fi
-
-    log_info "Saving snapshot..."
-    $ADB emu avd snapshot save fresh-install
 }
 
-android_boot_attempt() {
-    API=$1
-    AVDNAME=${AVD_PREFIX}${API}
+android_launch() {
+    local API=$1
+    local AVDNAME=${AVD_PREFIX}${API}
+    local PORT=6${API}0
 
-    log_info "Stopping Android emulator..."
-    while [[ -n $(pgrep -f ${AVDNAME}) ]]; do
-        pkill -9 -f ${AVDNAME}
-    done
+    export ADB="${ANDROID_HOME}/platform-tools/adb -s emulator-${PORT}"
 
-    log_info "Launching emulator..."
+    if [ -n "$KILL_EMU" ]; then
+        log_info "Stopping Android emulator..."
+        while [[ -n $(pgrep -f ${AVDNAME}) ]]; do
+            pkill -9 -f ${AVDNAME}
+            sleep 1
+        done
+    fi
+
+    if pgrep -f "${AVDNAME}" > /dev/null; then
+        log_info "Emulator already running (API $API), reusing..."
+        return 0
+    fi
+
+    log_info "Launching emulator (API $API)..."
+    local EMULATOR_LOG="build/emulator-${API}.log"
     $EMULATOR \
         -avd $AVDNAME \
-        -port 6${API}0 \
-        -snapshot fresh-install \
-        -no-snapshot-save \
-        -wipe-data \
-        1>/dev/null 2>&1 &
+        -port $PORT \
+        -no-snapshot \
+        1>"$EMULATOR_LOG" 2>&1 &
 
     log_info "Waiting for emulator to boot..."
-    export ADB="$ADB -s emulator-6${API}0"
-    sleep 5
-    timeout $BOOT_TIMEOUT $ADB wait-for-device shell 'while [[ -z "$(getprop sys.boot_completed)" ]]; do echo Waiting...; sleep 1; done; input keyevent 82'
+    timeout $BOOT_TIMEOUT $ADB wait-for-device shell \
+        'while [[ -z "$(getprop sys.boot_completed)" ]]; do sleep 1; done; input keyevent 82' &
+    local WAIT_PID=$!
+
+    while kill -0 $WAIT_PID 2>/dev/null; do
+        if grep -q "FATAL" "$EMULATOR_LOG" 2>/dev/null; then
+            log_error "Emulator crashed:"
+            grep "FATAL" "$EMULATOR_LOG"
+            kill $WAIT_PID 2>/dev/null
+            wait $WAIT_PID 2>/dev/null
+            return 1
+        fi
+        sleep 2
+    done
+
+    wait $WAIT_PID
     if [ $? -ne 0 ]; then
         log_error "Emulator failed to boot after $BOOT_TIMEOUT seconds."
         return 1
     fi
 
     log_info "Disabling animations..."
-    $ADB root || return 1
+    run $ADB root || return 1
     sleep 5
-    $ADB shell settings put global window_animation_scale 0 || return 1
-    $ADB shell settings put global transition_animation_scale 0 || return 1
-    $ADB shell settings put global animator_duration_scale 0 || return 1
+    run $ADB shell settings put global window_animation_scale 0 || return 1
+    run $ADB shell settings put global transition_animation_scale 0 || return 1
+    run $ADB shell settings put global animator_duration_scale 0 || return 1
 
     log_info "Acquiring wake lock..."
-    $ADB shell 'echo android-test > /sys/power/wake_lock' || return 1
-
-}
-
-android_boot() {
-    for attempt in {1..5}; do
-        android_boot_attempt $1 && return 0
-        sleep 5
-    done
-    log_error "Too many failed attempts. Aborting."
-    return 1
+    run $ADB shell 'echo android-test > /sys/power/wake_lock' || return 1
 }
 
 # shellcheck disable=SC2016
@@ -171,33 +236,33 @@ android_test() {
     API=$1
     AVDNAME=${AVD_PREFIX}${API}
 
-    android_boot $API || return 1
+    android_launch $API || return 1
 
     if [ -n "$RELEASE" ]; then
         log_info "Installing release APK..."
-        $ADB install -r ${ANDROID_OUTPUTS_DIR}/apk/release/uhabits-android-release.apk || return 1
+        run $ADB install -r ${ANDROID_OUTPUTS_DIR}/apk/release/uhabits-android-release.apk || return 1
     else
         log_info "Installing debug APK..."
-        $ADB install -t -r ${ANDROID_OUTPUTS_DIR}/apk/debug/uhabits-android-debug.apk || return 1
+        run $ADB install -t -r ${ANDROID_OUTPUTS_DIR}/apk/debug/uhabits-android-debug.apk || return 1
     fi
     log_info "Installing test APK..."
-    $ADB install -r ${ANDROID_OUTPUTS_DIR}/apk/androidTest/debug/uhabits-android-debug-androidTest.apk || return 1
+    run $ADB install -r ${ANDROID_OUTPUTS_DIR}/apk/androidTest/debug/uhabits-android-debug-androidTest.apk || return 1
 
     for size in medium large; do
         OUT_INSTRUMENT=${ANDROID_OUTPUTS_DIR}/instrument-${API}.txt
         OUT_LOGCAT=${ANDROID_OUTPUTS_DIR}/logcat-${API}.txt
         FAILED_TESTS=""
-        for i in {1..10}; do
+        for ((i=1; i<=ATTEMPTS; i++)); do
             log_info "Running $size instrumented tests (attempt $i)..."
             $ADB shell am instrument \
                 -r -e coverage true -e size "$size" $FAILED_TESTS \
                 -w ${PACKAGE_NAME}.test/androidx.test.runner.AndroidJUnitRunner \
-                | ts "%.s" | tee "$OUT_INSTRUMENT"
+                | ts "%.s" > "$OUT_INSTRUMENT"
 
             FAILED_TESTS=$(tools/parseInstrument.py "$OUT_INSTRUMENT")
             SUCCESS=$?
             if [ $SUCCESS -eq 0 ]; then
-                log_info "$size tests passed."
+                log_debug "$size tests passed"
                 break
             fi
         done
@@ -207,8 +272,9 @@ android_test() {
             log_error "Saving logcat: $OUT_LOGCAT..."
             $ADB logcat -d > $OUT_LOGCAT
             log_error "Fetching test screenshots..."
-            $ADB pull /sdcard/Android/data/${PACKAGE_NAME}/files/test-screenshots ${ANDROID_OUTPUTS_DIR}/
-            $ADB shell rm -r /sdcard/Android/data/${PACKAGE_NAME}/files/test-screenshots/
+            rm -rf ${ANDROID_OUTPUTS_DIR}/test-screenshots
+            run $ADB pull /sdcard/Android/data/${PACKAGE_NAME}/files/test-screenshots ${ANDROID_OUTPUTS_DIR}/
+            run $ADB shell rm -r /sdcard/Android/data/${PACKAGE_NAME}/files/test-screenshots/
             return 1
         fi
     done
@@ -245,7 +311,6 @@ android_test_parallel() {
         if [ $ret_code != 0 ]; then
             success=1
         fi
-        echo pid=$pid ret_code=$ret_code success=$success
     done
 
     # Print all logs
@@ -268,55 +333,54 @@ android_build() {
     fi
 
     log_info "Removing old APKs..."
-    rm -vf uhabits-android/build/*.apk
+    rm -f uhabits-android/build/*.apk
 
     if [ -n "$RELEASE" ]; then
         log_info "Building release APK..."
-        $GRADLE updateTranslators
-        $GRADLE :uhabits-android:assembleRelease
-        cp -v \
-            uhabits-android/build/outputs/apk/release/uhabits-android-release.apk \
+        gradle_run updateTranslators
+        gradle_run :uhabits-android:assembleRelease
+        log_info "Copying release APK..."
+        cp  uhabits-android/build/outputs/apk/release/uhabits-android-release.apk \
             uhabits-android/build/loop-"$VERSION"-release.apk
     fi
 
     log_info "Building debug APK..."
-    $GRADLE :uhabits-android:assembleDebug --stacktrace || fail
-    cp -v \
-        uhabits-android/build/outputs/apk/debug/uhabits-android-debug.apk \
+    gradle_run :uhabits-android:assembleDebug || fail
+    log_info "Copying debug APK..."
+    cp  uhabits-android/build/outputs/apk/debug/uhabits-android-debug.apk \
         uhabits-android/build/loop-"$VERSION"-debug.apk
 
     log_info "Building instrumentation APK..."
     if [ -n "$RELEASE" ]; then
-        $GRADLE :uhabits-android:assembleAndroidTest  \
+        gradle_run :uhabits-android:assembleAndroidTest  \
             -Pandroid.injected.signing.store.file="$LOOP_KEY_STORE" \
             -Pandroid.injected.signing.store.password="$LOOP_STORE_PASSWORD" \
             -Pandroid.injected.signing.key.alias="$LOOP_KEY_ALIAS" \
             -Pandroid.injected.signing.key.password="$LOOP_KEY_PASSWORD" || fail
     else
-        $GRADLE assembleAndroidTest || fail
+        gradle_run assembleAndroidTest || fail
     fi
 
     return 0
 }
 
 android_accept_images() {
-    find ${ANDROID_OUTPUTS_DIR}/test-screenshots -name '*.expected*' -delete
-    rsync -av ${ANDROID_OUTPUTS_DIR}/test-screenshots/ uhabits-android/src/androidTest/assets/
+    log_info "Accepting test screenshots..."
+    run find ${ANDROID_OUTPUTS_DIR}/test-screenshots -name '*.expected*' -delete
+    run rsync -av ${ANDROID_OUTPUTS_DIR}/test-screenshots/ uhabits-android/src/androidTest/assets/
 }
 
 # General
 # -----------------------------------------------------------------------------
 
 _parse_opts() {
-    if ! OPTS="$(getopt -o r --long release -n 'build.sh' -- "$@")" ; then
-      exit 1;
-    fi
-    eval set -- "$OPTS"
-
-    while true; do
+    while [ $# -gt 0 ]; do
         case "$1" in
-            -r | --release ) RELEASE=1; shift ;;
-            * ) break ;;
+            -r ) RELEASE=1; shift ;;
+            -c ) CLEAN=1; shift ;;
+            -k ) KILL_EMU=1; shift ;;
+            -n ) ATTEMPTS=$2; shift 2 ;;
+            * ) shift ;;
         esac
     done
 }
@@ -327,6 +391,7 @@ CI/CD script for Loop Habit Tracker.
 
 Usage:
     build.sh build [options]
+    build.sh android-accept-licenses
     build.sh android-setup <API>
     build.sh android-tests <API> [options]
     build.sh android-tests-parallel <API> <API>... [options]
@@ -334,41 +399,49 @@ Usage:
 
 Commands:
     build                   Build the app and run small tests
+    android-accept-licenses Accept all Android SDK licenses
     android-setup           Create Android virtual machine
     android-tests           Run medium and large Android tests on an emulator
     android-tests-parallel  Tests multiple API levels simultaneously
     android-accept-images   Copy fetched images to corresponding assets folder
 
 Options:
-    -r  --release       Build and test release version, instead of debug
+    -c      Remove build folders before building
+    -k      Kill running emulator before tests (default: reuse if running)
+    -n N    Number of test attempts per size (default: 1)
+    -r      Build and test release version, instead of debug
 END
 }
 
 clean() {
-    rm -rfv uhabits-android/.gradle
-    rm -rfv uhabits-android/android-pickers/build
-    rm -rfv uhabits-android/build
-    rm -rfv uhabits-android/uhabits-android/build
-    rm -rfv uhabits-core-legacy/.gradle
-    rm -rfv uhabits-core-legacy/build
-    rm -rfv uhabits-core/.gradle
-    rm -rfv uhabits-core/build
-    rm -rfv uhabits-server/.gradle
-    rm -rfv uhabits-server/build
-    rm -rfv uhabits-web/build
-    rm -rfv uhabits-web/node_modules
-    rm -rfv uhabits-web/node_modules/core-js/build
-    rm -rfv uhabits-web/node_modules/upath/build
-    rm -rfv .gradle
+    log_info "Cleaning build folders..."
+    rm -rf uhabits-android/.gradle
+    rm -rf uhabits-android/android-pickers/build
+    rm -rf uhabits-android/build
+    rm -rf uhabits-android/uhabits-android/build
+    rm -rf uhabits-core-legacy/.gradle
+    rm -rf uhabits-core-legacy/build
+    rm -rf uhabits-core/.gradle
+    rm -rf uhabits-core/build
+    rm -rf uhabits-server/.gradle
+    rm -rf uhabits-server/build
+    rm -rf uhabits-web/build
+    rm -rf uhabits-web/node_modules
+    rm -rf uhabits-web/node_modules/core-js/build
+    rm -rf uhabits-web/node_modules/upath/build
+    rm -rf .gradle
 }
 
 main() {
     case "$1" in
         build)
             shift; _parse_opts "$@"
-            clean
+            if [ -n "$CLEAN" ]; then clean; fi
             core_build
             android_build
+            ;;
+        android-accept-licenses)
+            android_accept_licenses
             ;;
         android-setup)
             shift; _parse_opts "$@"

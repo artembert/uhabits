@@ -19,16 +19,16 @@
 
 package org.isoron.uhabits.tasks
 
+import me.tatarka.inject.annotations.Inject
+import org.isoron.platform.io.UserFile
 import org.isoron.uhabits.core.io.GenericImporter
 import org.isoron.uhabits.core.models.ModelFactory
-import java.io.File
-import javax.inject.Inject
 
-class ImportDataTaskFactory
-@Inject constructor(
+@Inject
+class ImportDataTaskFactory(
     private val importer: GenericImporter,
     private val modelFactory: ModelFactory
 ) {
-    fun create(file: File, listener: ImportDataTask.Listener) =
+    fun create(file: UserFile, listener: ImportDataTask.Listener) =
         ImportDataTask(importer, modelFactory, file, listener)
 }

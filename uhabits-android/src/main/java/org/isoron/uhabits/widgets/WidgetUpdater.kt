@@ -23,27 +23,29 @@ import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import me.tatarka.inject.annotations.Inject
+import org.isoron.platform.time.DateUtils
 import org.isoron.uhabits.core.commands.Command
 import org.isoron.uhabits.core.commands.CommandRunner
 import org.isoron.uhabits.core.commands.CreateRepetitionCommand
+import org.isoron.uhabits.core.preferences.Preferences
 import org.isoron.uhabits.core.preferences.WidgetPreferences
 import org.isoron.uhabits.core.tasks.TaskRunner
-import org.isoron.uhabits.core.utils.DateUtils
 import org.isoron.uhabits.inject.AppContext
 import org.isoron.uhabits.intents.IntentScheduler
-import javax.inject.Inject
 
 /**
  * A WidgetUpdater listens to the commands being executed by the application and
  * updates the home-screen widgets accordingly.
  */
-class WidgetUpdater
-@Inject constructor(
+@Inject
+class WidgetUpdater(
     @AppContext private val context: Context,
     private val commandRunner: CommandRunner,
     private val taskRunner: TaskRunner,
     private val widgetPrefs: WidgetPreferences,
-    private val intentScheduler: IntentScheduler
+    private val intentScheduler: IntentScheduler,
+    private val preferences: Preferences
 ) : CommandRunner.Listener {
 
     override fun onCommandFinished(command: Command) {
@@ -72,7 +74,7 @@ class WidgetUpdater
     }
 
     fun scheduleStartDayWidgetUpdate() {
-        val timestamp = DateUtils.getStartOfTomorrowWithOffset()
+        val timestamp = DateUtils.getStartOfTomorrowWithOffset(preferences.midnightDelayHours, 0)
         intentScheduler.scheduleWidgetUpdate(timestamp)
     }
 
